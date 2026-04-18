@@ -163,14 +163,13 @@ button.btn:disabled { opacity: 0.45; cursor: not-allowed; }
 /* ── Teams tab ── */
 .input-row { display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
 .input-row input { flex: 1; min-width: 140px; }
-.team-list { display: flex; flex-direction: column; gap: 8px; min-height: 28px; }
+.team-list { display: flex; flex-direction: column; gap: 10px; min-height: 28px; }
 .team-row {
-  display: flex; align-items: center; gap: 10px;
   background: #f0fdf4; border: 1.5px solid #bbf7d0;
-  border-radius: 12px; padding: 8px 12px;
+  border-radius: 12px; padding: 10px 12px;
 }
+.team-row .t-main { display: flex; align-items: center; gap: 10px; }
 .team-row .t-name { font-size: 0.9rem; font-weight: 600; color: #166534; }
-.team-row .t-meta { font-size: 0.72rem; color: #6b7280; }
 .team-row .group-badge {
   font-size: 0.68rem; font-weight: 700;
   background: #dcfce7; color: #166534; border-radius: 4px;
@@ -183,6 +182,29 @@ button.btn:disabled { opacity: 0.45; cursor: not-allowed; }
   transition: color .15s;
 }
 .team-row button.remove:hover { color: #dc2626; }
+.team-row .t-emails { display: flex; flex-direction: column; gap: 4px; margin-top: 8px; }
+.email-line {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 0.76rem; color: #374151;
+}
+.email-line .email-addr { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.email-line .email-addr.missing { color: #d97706; font-style: italic; }
+.btn-invite {
+  background: white; border: 1px solid #bbf7d0; color: #166534;
+  padding: 3px 9px; font-size: 0.7rem; border-radius: 6px;
+  cursor: pointer; font-family: inherit; font-weight: 600;
+  text-decoration: none; display: inline-flex; align-items: center; gap: 4px;
+  transition: background .15s, border-color .15s;
+}
+.btn-invite:hover { background: #dcfce7; border-color: #86efac; }
+.btn-copy {
+  background: transparent; border: 1px solid #e5e7eb; color: #6b7280;
+  padding: 3px 9px; font-size: 0.7rem; border-radius: 6px;
+  cursor: pointer; font-family: inherit; font-weight: 500;
+  transition: all .15s;
+}
+.btn-copy:hover { color: #374151; border-color: #9ca3af; }
+.btn-copy.copied { background: #f0fdf4; color: #16a34a; border-color: #bbf7d0; }
 .hint { font-size: 0.79rem; color: #9ca3af; }
 
 /* ── Deadline banner ── */
@@ -463,7 +485,11 @@ button.btn:disabled { opacity: 0.45; cursor: not-allowed; }
     </div>
 
     <div class="card">
-      <div class="card-label">Teams</div>
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:14px; flex-wrap:wrap">
+        <div class="card-label" style="margin-bottom:0">Teams</div>
+        <span style="flex:1"></span>
+        <a id="inviteAllBtn" class="btn-invite" href="#" style="display:none" onclick="inviteAllPlayers(event)">📧 Email invitations to all players</a>
+      </div>
       <div class="team-list" id="teamList">
         <span class="hint">No teams yet.</span>
       </div>
@@ -747,27 +773,47 @@ function renderTeams() {
   const list    = document.getElementById('teamList');
   const preview = document.getElementById('teamsPreview');
   const note    = document.getElementById('generateNote');
+  const inviteAllBtn = document.getElementById('inviteAllBtn');
 
   if (!state.teams.length) {
     list.innerHTML = '<span class="hint">No teams yet.</span>';
     if (preview) preview.textContent = '';
+    if (inviteAllBtn) inviteAllBtn.style.display = 'none';
     return;
   }
 
   const admin = isAdmin();
   list.innerHTML = state.teams.map((t, i) => {
     const grp = state.generated ? GROUP_LABELS[Math.floor(i/3)] : null;
-    const memHtml = (t.memberEmails && t.memberEmails.length)
-      ? `<span class="t-meta">· ${t.memberEmails.map(e => escHtml(e)).join(', ')}</span>`
-      : `<span class="t-meta" style="color:#f59e0b">· no emails linked</span>`;
+    let emailsHtml = '';
+    if (!t.memberEmails || t.memberEmails.length === 0) {
+      emailsHtml = `<div class="t-emails"><div class="email-line"><span class="email-addr missing">No emails linked yet</span></div></div>`;
+    } else {
+      emailsHtml = `<div class="t-emails">` + t.memberEmails.map(e => `
+        <div class="email-line">
+          <span class="email-addr">${escHtml(e)}</span>
+          ${admin ? `
+            <a class="btn-invite" href="${buildInviteMailto(e, t)}" target="_blank" rel="noopener">📧 Invite</a>
+            <button class="btn-copy" onclick="copyInviteText(this, '${escA(e)}', ${t.id})">Copy text</button>
+          ` : ''}
+        </div>`).join('') + `</div>`;
+    }
     return `<div class="team-row">
-      <span class="t-name">${escHtml(t.name)}</span>
-      ${grp ? `<span class="group-badge">Group ${grp}</span>` : ''}
-      ${memHtml}
-      <span class="t-spacer"></span>
-      ${admin ? `<button class="remove" onclick="removeTeam(${t.id})" title="Remove">×</button>` : ''}
+      <div class="t-main">
+        <span class="t-name">${escHtml(t.name)}</span>
+        ${grp ? `<span class="group-badge">Group ${grp}</span>` : ''}
+        <span class="t-spacer"></span>
+        ${admin ? `<button class="remove" onclick="removeTeam(${t.id})" title="Remove">×</button>` : ''}
+      </div>
+      ${emailsHtml}
     </div>`;
   }).join('');
+
+  if (inviteAllBtn) {
+    const anyEmails = state.teams.some(t => t.memberEmails && t.memberEmails.length);
+    inviteAllBtn.style.display = (admin && anyEmails) ? 'inline-flex' : 'none';
+    if (admin && anyEmails) inviteAllBtn.href = buildBulkInviteMailto();
+  }
 
   if (!preview) return;
   const n = state.teams.length;
@@ -779,6 +825,88 @@ function renderTeams() {
     note.textContent = '';
   }
 }
+
+// ── Invitations ───────────────────────────────────────────────────────────────
+const SITE_URL = 'https://pnader-cell.github.io/Spring-2026-Tennis-Tourney/';
+
+function buildInviteBody(email, team) {
+  const partners = (team.memberEmails || []).filter(e => e && e.toLowerCase() !== (email||'').toLowerCase());
+  const partnerLine = partners.length
+    ? `Your partner: ${partners.join(', ')}\n`
+    : '';
+  return [
+    `Hi!`,
+    ``,
+    `You've been added to the Spring 2026 Haas Mixed Doubles Tournament as part of team "${team.name}".`,
+    partnerLine ? partnerLine.trim() : null,
+    ``,
+    `View the schedule, propose match times, accept invitations, and record scores here:`,
+    SITE_URL,
+    ``,
+    email ? `To be recognized as a team member, sign in with Google using ${email}.` : `Sign in with Google to participate.`,
+    ``,
+    `Tournament timeline:`,
+    `• Group stage: April 20 – April 30`,
+    `• Semi-finals & final: May 4 – May 8`,
+    ``,
+    `See you on the court!`,
+    `— Patricia`,
+  ].filter(l => l !== null).join('\n');
+}
+
+function buildInviteMailto(email, team) {
+  const subject = `You're invited — Spring 2026 Haas Mixed Doubles Tournament`;
+  const body = buildInviteBody(email, team);
+  return `mailto:${encodeURIComponent(email)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+}
+
+function buildBulkInviteMailto() {
+  // One email, BCC everyone, generic body (no per-player partner info)
+  const allEmails = [];
+  state.teams.forEach(t => (t.memberEmails || []).forEach(e => { if (e && !allEmails.includes(e)) allEmails.push(e); }));
+  const subject = `You're invited — Spring 2026 Haas Mixed Doubles Tournament`;
+  const body = [
+    `Hi all!`,
+    ``,
+    `You've been added to the Spring 2026 Haas Mixed Doubles Tournament. Each of you is on a team — check the site to see who your partner is.`,
+    ``,
+    `View the schedule, propose match times, accept invitations, and record scores here:`,
+    SITE_URL,
+    ``,
+    `Sign in with Google using the same email address you received this invitation at, so you're recognized as a team member.`,
+    ``,
+    `Tournament timeline:`,
+    `• Group stage: April 20 – April 30`,
+    `• Semi-finals & final: May 4 – May 8`,
+    ``,
+    `See you on the court!`,
+    `— Patricia`,
+  ].join('\n');
+  return `mailto:?bcc=${encodeURIComponent(allEmails.join(','))}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+}
+
+window.inviteAllPlayers = function(ev) {
+  // The href is already set; fallback if for some reason it wasn't
+  if (!ev.currentTarget.href || ev.currentTarget.href === '#') {
+    ev.preventDefault();
+    window.location.href = buildBulkInviteMailto();
+  }
+};
+
+window.copyInviteText = async function(btn, email, teamId) {
+  const team = state.teams.find(t => t.id === teamId);
+  if (!team) return;
+  const text = `Subject: You're invited — Spring 2026 Haas Mixed Doubles Tournament\n\n${buildInviteBody(email, team)}`;
+  try {
+    await navigator.clipboard.writeText(text);
+    const original = btn.textContent;
+    btn.classList.add('copied');
+    btn.textContent = '✓ Copied';
+    setTimeout(() => { btn.classList.remove('copied'); btn.textContent = original; }, 1800);
+  } catch (e) {
+    alert('Could not copy. Select and copy manually:\n\n' + text);
+  }
+};
 
 // ── Schedule generation ───────────────────────────────────────────────────────
 window.generateSchedule = async function() {
