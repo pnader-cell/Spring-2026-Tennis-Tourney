@@ -534,7 +534,7 @@ button.btn:disabled { opacity: 0.45; cursor: not-allowed; }
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import {
-  getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged
+  getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import {
   getFirestore, doc, onSnapshot, setDoc, getDoc, serverTimestamp
@@ -592,17 +592,82 @@ let syncTimer = null;
 // ── Auth ──────────────────────────────────────────────────────────────────────
 const provider = new GoogleAuthProvider();
 
+function isInAppBrowser() {
+  const ua = navigator.userAgent || '';
+  // WhatsApp, Facebook, Instagram, Line, Messenger, TikTok, Twitter webviews
+  return /(FBAN|FBAV|FB_IAB|FBIOS|Instagram|Line\/|MicroMessenger|WhatsApp|Twitter|TikTok|Snapchat)/i.test(ua);
+}
+
+function isMobile() {
+  return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent || '');
+}
+
+function showInAppBrowserHelp() {
+  const gate = document.querySelector('.signin-card');
+  gate.innerHTML = `
+    <div class="emoji">🎾</div>
+    <h2>Please open in your browser</h2>
+    <div class="sub">Google sign-in doesn't work inside WhatsApp / Instagram / Facebook. Open this page in Safari or Chrome to sign in.</div>
+    <div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;padding:10px 12px;font-size:0.78rem;color:#374151;word-break:break-all;margin-bottom:14px;user-select:all">${window.location.href}</div>
+    <button class="google-btn" id="copyLinkBtn" style="margin-bottom:8px">
+      <span>📋 Copy link</span>
+    </button>
+    <div style="font-size:0.75rem;color:#9ca3af;line-height:1.5;margin-top:10px">
+      <strong>On iPhone:</strong> tap the <strong>•••</strong> menu (bottom-right) → <strong>Open in Safari</strong><br>
+      <strong>On Android:</strong> tap the <strong>•••</strong> menu (top-right) → <strong>Open in Chrome</strong>
+    </div>
+  `;
+  document.getElementById('copyLinkBtn').addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      document.getElementById('copyLinkBtn').innerHTML = '<span>✓ Copied — paste in Safari/Chrome</span>';
+    } catch (e) {
+      alert('Link: ' + window.location.href);
+    }
+  });
+}
+
 document.getElementById('googleSigninBtn').addEventListener('click', async () => {
   const errEl = document.getElementById('signinError');
   errEl.classList.remove('show');
+
+  if (isInAppBrowser()) {
+    showInAppBrowserHelp();
+    return;
+  }
+
   try {
-    await signInWithPopup(auth, provider);
+    // Mobile browsers handle redirect better than popup; desktop uses popup
+    if (isMobile()) {
+      await signInWithRedirect(auth, provider);
+    } else {
+      await signInWithPopup(auth, provider);
+    }
   } catch (e) {
     console.error(e);
+    // Common popup failures → fall back to redirect
+    const fallbackCodes = ['auth/popup-blocked', 'auth/popup-closed-by-user', 'auth/operation-not-supported-in-this-environment', 'auth/cancelled-popup-request'];
+    if (fallbackCodes.includes(e.code)) {
+      try { await signInWithRedirect(auth, provider); return; } catch(e2) { e = e2; }
+    }
     errEl.textContent = 'Sign-in failed: ' + (e.message || e.code || 'unknown error');
     errEl.classList.add('show');
   }
 });
+
+// Handle redirect-based sign-in result on page load
+getRedirectResult(auth).catch((e) => {
+  if (e && e.code && e.code !== 'auth/no-auth-event') console.error('Redirect sign-in error', e);
+});
+
+// If landed in an in-app browser, show the helper proactively
+if (isInAppBrowser()) {
+  window.addEventListener('DOMContentLoaded', () => {
+    if (document.getElementById('signinGate').style.display !== 'none') {
+      showInAppBrowserHelp();
+    }
+  });
+}
 
 onAuthStateChanged(auth, (user) => {
   currentUser = user;
