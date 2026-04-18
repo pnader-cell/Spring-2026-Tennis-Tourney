@@ -1,0 +1,44 @@
+rules_version = '2';
+
+// Firestore rules for Haas Mixed Doubles Tournament.
+// Paste the contents of this file into Firebase Console:
+//   Firestore Database → Rules tab → replace everything → Publish
+//
+// Security model:
+//   - Must be signed in (authenticated) to read or write anything.
+//   - Only the admin (by email) can create or delete the tournament document.
+//   - Any authenticated user can update it; the app's UI enforces
+//     who can edit which match (team members edit their own team's
+//     matches, opposing team accepts invitations, etc.).
+//
+// Trust note: this is a small friendly tournament. Players theoretically
+// could bypass the UI, but unsigned strangers cannot read or modify
+// anything. That's the right balance of simplicity and security for now.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isAdmin() {
+      return request.auth != null
+        && request.auth.token.email != null
+        && request.auth.token.email.lower() == 'patriciaanader@gmail.com';
+    }
+
+    function isSignedIn() {
+      return request.auth != null
+        && request.auth.token.email != null
+        && request.auth.token.email_verified == true;
+    }
+
+    match /tournaments/{id} {
+      // Any signed-in user may read the tournament
+      allow read: if isSignedIn();
+
+      // Only admin can create the initial document or delete it
+      allow create, delete: if isAdmin();
+
+      // Any signed-in user may update; UI enforces finer rules
+      allow update: if isSignedIn();
+    }
+  }
+}

@@ -20,7 +20,7 @@ body {
 header {
   background: #071f12;
   color: white;
-  padding: 16px 28px;
+  padding: 14px 28px;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -28,6 +28,71 @@ header {
 }
 header h1 { font-size: 1.05rem; font-weight: 700; letter-spacing: -0.2px; flex: 1; }
 header .sub { color: rgba(255,255,255,0.38); font-weight: 400; }
+
+.user-chip {
+  display: flex; align-items: center; gap: 10px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 22px;
+  padding: 4px 6px 4px 4px;
+  font-size: 0.8rem; font-weight: 500;
+  color: rgba(255,255,255,0.85);
+}
+.user-chip img {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: rgba(255,255,255,0.1);
+}
+.user-chip .user-name { max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.user-chip .admin-badge {
+  font-size: 0.6rem; font-weight: 700;
+  background: #fef08a; color: #713f12;
+  padding: 1px 6px; border-radius: 4px;
+  letter-spacing: 0.3px;
+}
+.user-chip button {
+  background: none; border: none; color: rgba(255,255,255,0.5);
+  cursor: pointer; font-size: 0.75rem; font-weight: 500;
+  padding: 4px 8px; border-radius: 12px;
+  font-family: inherit;
+  transition: color .15s, background .15s;
+}
+.user-chip button:hover { color: white; background: rgba(255,255,255,0.08); }
+
+/* ── Sign-in gate ── */
+.signin-gate {
+  position: fixed; inset: 0;
+  background: #0d3b22;
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+  z-index: 100;
+}
+.signin-card {
+  background: white; border-radius: 16px;
+  padding: 40px 36px; max-width: 420px; width: 100%;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.3);
+  text-align: center;
+}
+.signin-card .emoji { font-size: 2.4rem; margin-bottom: 12px; }
+.signin-card h2 { font-size: 1.15rem; font-weight: 700; margin-bottom: 6px; color: #111; }
+.signin-card .sub { font-size: 0.85rem; color: #6b7280; margin-bottom: 24px; line-height: 1.5; }
+.google-btn {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 11px 22px; border-radius: 10px;
+  background: white; color: #374151;
+  border: 1.5px solid #e5e7eb;
+  font-family: inherit; font-size: 0.9rem; font-weight: 600;
+  cursor: pointer;
+  transition: border-color .15s, box-shadow .15s;
+}
+.google-btn:hover { border-color: #9ca3af; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+.google-btn svg { width: 18px; height: 18px; }
+.signin-error {
+  margin-top: 18px; color: #991b1b; font-size: 0.8rem;
+  background: #fef2f2; border: 1px solid #fecaca;
+  border-radius: 8px; padding: 8px 12px;
+  display: none;
+}
+.signin-error.show { display: block; }
 
 /* ── Tabs ── */
 .tabs {
@@ -65,7 +130,7 @@ header .sub { color: rgba(255,255,255,0.38); font-weight: 400; }
 }
 
 /* ── Inputs ── */
-input[type="text"], input[type="date"], select {
+input[type="text"], input[type="email"], input[type="date"], input[type="time"], select {
   padding: 8px 12px; border: 1.5px solid #e5e7eb; border-radius: 8px;
   font-size: 0.88rem; outline: none; font-family: inherit;
   background: white; color: #111;
@@ -75,6 +140,9 @@ input:focus, select:focus {
   border-color: #16a34a;
   box-shadow: 0 0 0 3px rgba(22,163,74,0.1);
 }
+input:disabled, select:disabled {
+  background: #f9fafb; color: #9ca3af; cursor: not-allowed;
+}
 
 /* ── Buttons ── */
 button.btn {
@@ -82,36 +150,39 @@ button.btn {
   cursor: pointer; font-size: 0.84rem; font-weight: 600;
   font-family: inherit; transition: all .15s; letter-spacing: -0.1px;
 }
+button.btn:disabled { opacity: 0.45; cursor: not-allowed; }
 .btn-green  { background: #16a34a; color: white; }
-.btn-green:hover  { background: #15803d; }
+.btn-green:hover:not(:disabled)  { background: #15803d; }
 .btn-blue   { background: #2563eb; color: white; }
-.btn-blue:hover   { background: #1d4ed8; }
+.btn-blue:hover:not(:disabled)   { background: #1d4ed8; }
 .btn-outline { background: transparent; border: 1.5px solid #d1d5db; color: #6b7280; }
-.btn-outline:hover { border-color: #9ca3af; color: #374151; }
+.btn-outline:hover:not(:disabled) { border-color: #9ca3af; color: #374151; }
 .btn-sm  { padding: 5px 11px; font-size: 0.78rem; border-radius: 7px; }
 .btn-xs  { padding: 3px 9px;  font-size: 0.73rem; border-radius: 6px; }
 
 /* ── Teams tab ── */
-.input-row { display: flex; gap: 8px; margin-bottom: 14px; }
-.input-row input { flex: 1; }
-.team-list { display: flex; flex-wrap: wrap; gap: 8px; min-height: 28px; }
-.team-chip {
-  display: flex; align-items: center; gap: 6px;
+.input-row { display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+.input-row input { flex: 1; min-width: 140px; }
+.team-list { display: flex; flex-direction: column; gap: 8px; min-height: 28px; }
+.team-row {
+  display: flex; align-items: center; gap: 10px;
   background: #f0fdf4; border: 1.5px solid #bbf7d0;
-  border-radius: 20px; padding: 5px 12px 5px 14px;
-  font-size: 0.84rem; font-weight: 500; color: #166534;
+  border-radius: 12px; padding: 8px 12px;
 }
-.team-chip .group-badge {
+.team-row .t-name { font-size: 0.9rem; font-weight: 600; color: #166534; }
+.team-row .t-meta { font-size: 0.72rem; color: #6b7280; }
+.team-row .group-badge {
   font-size: 0.68rem; font-weight: 700;
   background: #dcfce7; color: #166534; border-radius: 4px;
-  padding: 1px 5px; margin-left: 2px;
+  padding: 1px 5px;
 }
-.team-chip button {
+.team-row .t-spacer { flex: 1; }
+.team-row button.remove {
   background: none; border: none; color: #86efac;
-  cursor: pointer; font-size: 1rem; line-height: 1; padding: 0;
+  cursor: pointer; font-size: 1.2rem; line-height: 1; padding: 0 4px;
   transition: color .15s;
 }
-.team-chip button:hover { color: #dc2626; }
+.team-row button.remove:hover { color: #dc2626; }
 .hint { font-size: 0.79rem; color: #9ca3af; }
 
 /* ── Deadline banner ── */
@@ -142,7 +213,6 @@ button.btn {
 .group-progress { font-size: 0.75rem; color: #9ca3af; }
 .group-body { padding: 14px 18px; }
 
-/* Group standings mini-table */
 .standings-mini { width: 100%; border-collapse: collapse; font-size: 0.8rem; margin-bottom: 14px; }
 .standings-mini th {
   text-align: left; padding: 5px 8px;
@@ -179,7 +249,7 @@ button.btn {
 .vs-lbl { color: #e5e7eb; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.5px; }
 .match-ctrl { display: flex; gap: 5px; align-items: center; }
 .score-wrap { display: flex; align-items: center; gap: 4px; }
-.score-wrap input { width: 40px; text-align: center; padding: 4px; font-size: 0.84rem; }
+.score-wrap input { width: 44px; text-align: center; padding: 4px; font-size: 0.84rem; }
 .score-dash { color: #d1d5db; font-weight: 700; font-size: 0.84rem; }
 .score-badge {
   display: inline-flex; align-items: center; gap: 3px;
@@ -187,17 +257,12 @@ button.btn {
   font-size: 0.72rem; font-weight: 700;
   background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0;
 }
-/* Two-section match card layout */
 .match-section {
   border-top: 1px solid #f3f4f6;
   padding: 8px 12px 10px;
 }
 .match-section.pregame { background: #f9fafb; }
 .match-section.score-section { background: white; }
-.section-label {
-  font-size: 0.62rem; font-weight: 700; text-transform: uppercase;
-  letter-spacing: 0.6px; color: #9ca3af; margin-bottom: 7px;
-}
 .meta-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .meta-item { display: flex; align-items: center; gap: 5px; font-size: 0.75rem; color: #6b7280; }
 .meta-item select, .meta-item input[type="date"], .meta-item input[type="time"] {
@@ -223,43 +288,20 @@ button.btn {
   font-size: 0.68rem; font-weight: 700; color: rgba(255,255,255,0.35);
   text-transform: uppercase; letter-spacing: 0.7px; margin-bottom: 12px;
 }
-
-/* Visual bracket container */
 .bracket-visual {
-  display: flex;
-  align-items: center;
-  gap: 0;
-  padding: 20px 0;
-  overflow-x: auto;
+  display: flex; align-items: center; gap: 0;
+  padding: 20px 0; overflow-x: auto;
 }
-
-/* Column: two SF matches */
-.bracket-sf-col {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  flex-shrink: 0;
-}
-
-.bracket-sf-slot {
-  display: flex;
-  align-items: center;
-  padding: 20px 0;
-}
-
-/* The match box */
+.bracket-sf-col { display: flex; flex-direction: column; gap: 0; flex-shrink: 0; }
+.bracket-sf-slot { display: flex; align-items: center; padding: 20px 0; }
 .b-match {
-  background: white;
-  border-radius: 12px;
+  background: white; border-radius: 12px;
   border: 1.5px solid #e5e7eb;
-  width: 210px;
+  width: 220px;
   box-shadow: 0 1px 4px rgba(0,0,0,0.08), 0 3px 12px rgba(0,0,0,0.1);
-  overflow: hidden;
-  flex-shrink: 0;
+  overflow: hidden; flex-shrink: 0;
 }
 .b-match.complete { border-color: #bbf7d0; }
-.b-match.is-final { width: 210px; }
-
 .b-match-label {
   font-size: 0.62rem; font-weight: 700; text-transform: uppercase;
   letter-spacing: 0.6px; color: #9ca3af;
@@ -271,8 +313,7 @@ button.btn {
   display: flex; align-items: center; justify-content: space-between;
   padding: 8px 12px;
   border-bottom: 1px solid #f9fafb;
-  font-size: 0.84rem;
-  min-height: 36px;
+  font-size: 0.84rem; min-height: 36px;
 }
 .b-team-row:last-of-type { border-bottom: none; }
 .b-team-name { font-weight: 600; color: #374151; flex: 1; min-width: 0; }
@@ -281,7 +322,6 @@ button.btn {
 .b-team-name.tbd    { color: #d1d5db; font-style: italic; font-weight: 400; }
 .b-score { font-size: 0.78rem; color: #6b7280; margin-left: 6px; white-space: nowrap; }
 .b-score.winner { color: #16a34a; font-weight: 700; }
-
 .b-match-footer {
   padding: 8px 12px;
   border-top: 1px solid #f3f4f6;
@@ -289,7 +329,7 @@ button.btn {
   display: flex; flex-direction: column; gap: 6px;
 }
 .b-score-entry { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-.b-score-entry input { width: 40px; text-align: center; padding: 4px; font-size: 0.82rem; }
+.b-score-entry input { width: 44px; text-align: center; padding: 4px; font-size: 0.82rem; }
 .b-score-sep { color: #d1d5db; font-weight: 700; }
 .b-meta { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
 .b-meta select, .b-meta input[type="date"], .b-meta input[type="time"] {
@@ -302,109 +342,23 @@ button.btn {
 .b-meta input[type="time"] { width: 82px; }
 .b-meta select.unset, .b-meta input[type="date"].unset, .b-meta input[type="time"].unset { color: #9ca3af; }
 
-/* Connector lines between columns */
-.bracket-connector {
-  display: flex;
-  flex-direction: column;
-  flex-shrink: 0;
-  width: 40px;
-  align-self: stretch;
-}
-.conn-top {
-  flex: 1;
-  border-right: 2px solid rgba(255,255,255,0.15);
-  border-bottom: 2px solid rgba(255,255,255,0.15);
-  border-bottom-right-radius: 6px;
-}
-.conn-bot {
-  flex: 1;
-  border-right: 2px solid rgba(255,255,255,0.15);
-  border-top: 2px solid rgba(255,255,255,0.15);
-  border-top-right-radius: 6px;
-}
-.conn-straight {
-  flex: 1;
-  border-top: 2px solid rgba(255,255,255,0.15);
-  margin-top: auto; margin-bottom: auto;
-  align-self: center;
-  height: 2px; flex: none;
-  width: 40px;
-}
-
-/* Center connector (one line going into final) */
-.bracket-center-conn {
-  width: 40px;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  align-self: stretch;
-}
-.bracket-center-conn::before {
-  content: '';
-  display: block;
-  width: 100%;
-  height: 2px;
-  background: rgba(255,255,255,0.15);
-}
-
-/* Final column */
-.bracket-final-col {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: center;
-  flex-shrink: 0;
-  align-self: stretch;
-}
-
-/* Champion */
-.bracket-champ-conn {
-  width: 32px; flex-shrink: 0;
-  display: flex; align-items: center;
-}
-.bracket-champ-conn::before {
-  content: ''; width: 100%; height: 2px;
-  background: rgba(255,255,255,0.15);
-  display: block;
-}
-
+.bracket-connector { display: flex; flex-direction: column; flex-shrink: 0; width: 40px; align-self: stretch; }
+.conn-top { flex: 1; border-right: 2px solid rgba(255,255,255,0.15); border-bottom: 2px solid rgba(255,255,255,0.15); border-bottom-right-radius: 6px; }
+.conn-bot { flex: 1; border-right: 2px solid rgba(255,255,255,0.15); border-top: 2px solid rgba(255,255,255,0.15); border-top-right-radius: 6px; }
+.bracket-final-col { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; flex-shrink: 0; align-self: stretch; }
+.bracket-champ-conn { width: 32px; flex-shrink: 0; display: flex; align-items: center; }
+.bracket-champ-conn::before { content: ''; width: 100%; height: 2px; background: rgba(255,255,255,0.15); display: block; }
 .champion-box {
   background: linear-gradient(135deg, #854d0e 0%, #713f12 100%);
-  border: 2px solid #fef08a;
-  border-radius: 14px;
-  padding: 16px 20px;
-  text-align: center;
-  flex-shrink: 0;
-  min-width: 130px;
+  border: 2px solid #fef08a; border-radius: 14px;
+  padding: 16px 20px; text-align: center;
+  flex-shrink: 0; min-width: 130px;
   box-shadow: 0 2px 12px rgba(0,0,0,0.3);
 }
 .champ-trophy { font-size: 1.6rem; margin-bottom: 4px; }
 .champ-label { font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: #fcd34d; margin-bottom: 6px; }
 .champ-name { font-size: 0.85rem; font-weight: 700; color: #fef08a; }
 .champ-name.tbd { color: rgba(254,240,138,0.4); font-style: italic; font-weight: 400; }
-
-/* Standings tab (full) */
-.standings-table { width: 100%; border-collapse: collapse; font-size: 0.87rem; }
-.standings-table th {
-  text-align: left; padding: 9px 12px;
-  background: #f9fafb; color: #6b7280;
-  font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
-  border-bottom: 1px solid #f3f4f6;
-}
-.standings-table th.c { text-align: center; }
-.standings-table td { padding: 11px 12px; border-bottom: 1px solid #f9fafb; }
-.standings-table td.c { text-align: center; }
-.standings-table tr:last-child td { border-bottom: none; }
-.rank-badge {
-  display: inline-flex; align-items: center; justify-content: center;
-  width: 22px; height: 22px; border-radius: 50%;
-  font-size: 0.7rem; font-weight: 700;
-}
-.r1 { background: #fef08a; color: #713f12; }
-.r2 { background: #e5e7eb; color: #374151; }
-.r3 { background: #fed7aa; color: #7c2d12; }
-.r-other { background: #f3f4f6; color: #9ca3af; }
 
 /* Misc */
 .empty-state    { text-align: center; padding: 36px 20px; color: rgba(255,255,255,0.25); font-size: 0.87rem; }
@@ -417,26 +371,40 @@ button.btn {
 .pill-green { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; }
 .pill-gray  { background: #f3f4f6; color: #9ca3af; }
 
-/* Invitation / confirmation */
+/* Invitation */
 .invite-row {
   display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
   margin-top: 8px; padding-top: 8px; border-top: 1px dashed #e5e7eb;
 }
 .invite-msg { font-size: 0.72rem; color: #6b7280; flex: 1; min-width: 140px; }
-.invite-msg.pending { color: #92400e; }
-.invite-msg.missing { color: #9ca3af; }
+.invite-msg.pending  { color: #92400e; }
+.invite-msg.waiting  { color: #6b7280; }
+.invite-msg.missing  { color: #9ca3af; }
 .confirmed-badge {
   display: inline-flex; align-items: center; gap: 4px;
   background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0;
   border-radius: 20px; padding: 3px 10px;
   font-size: 0.72rem; font-weight: 700;
 }
-.btn-accept {
-  background: #d97706; color: white;
-}
-.btn-accept:hover { background: #b45309; }
+.btn-accept { background: #d97706; color: white; }
+.btn-accept:hover:not(:disabled) { background: #b45309; }
 
-/* ── Responsive ── */
+.read-only-note {
+  font-size: 0.72rem; color: #9ca3af; font-style: italic;
+  padding-top: 6px;
+}
+
+.sync-indicator {
+  position: fixed; bottom: 14px; right: 14px;
+  font-size: 0.72rem; font-weight: 500;
+  background: rgba(0,0,0,0.6); color: rgba(255,255,255,0.7);
+  padding: 5px 11px; border-radius: 14px;
+  opacity: 0; transition: opacity .2s;
+  pointer-events: none;
+  z-index: 50;
+}
+.sync-indicator.show { opacity: 1; }
+
 @media(max-width:560px){
   .match-teams { grid-template-columns: 1fr 1fr; }
   .match-teams .vs-lbl { display:none; }
@@ -446,35 +414,63 @@ button.btn {
 </head>
 <body>
 
+<!-- Sign-in gate (shown until user signs in) -->
+<div id="signinGate" class="signin-gate" style="display:none">
+  <div class="signin-card">
+    <div class="emoji">🎾</div>
+    <h2>Spring 2026 Haas Mixed Doubles</h2>
+    <div class="sub">Sign in with your Google account to view the schedule, accept match invitations, and record scores.</div>
+    <button class="google-btn" id="googleSigninBtn">
+      <svg viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg"><path d="M17.64 9.2c0-.64-.06-1.25-.17-1.84H9v3.48h4.84a4.14 4.14 0 01-1.8 2.71v2.26h2.92A8.78 8.78 0 0017.64 9.2z" fill="#4285F4"/><path d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.92-2.26c-.81.54-1.84.86-3.04.86-2.34 0-4.32-1.58-5.03-3.7H.96v2.33A9 9 0 009 18z" fill="#34A853"/><path d="M3.97 10.72A5.41 5.41 0 013.68 9c0-.6.1-1.18.29-1.72V4.95H.96A9 9 0 000 9c0 1.45.35 2.83.96 4.05l3.01-2.33z" fill="#FBBC05"/><path d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.58A8.99 8.99 0 009 0 9 9 0 00.96 4.95l3.01 2.33C4.68 5.16 6.66 3.58 9 3.58z" fill="#EA4335"/></svg>
+      <span>Sign in with Google</span>
+    </button>
+    <div class="signin-error" id="signinError"></div>
+  </div>
+</div>
+
+<!-- App (shown after sign-in) -->
+<div id="app" style="display:none">
+
 <header>
   <span style="font-size:1.3rem">🎾</span>
   <h1>Spring 2026 Haas Mixed Doubles <span class="sub">Tournament</span></h1>
+  <div class="user-chip" id="userChip"></div>
 </header>
 
 <nav class="tabs">
-  <button class="tab active" onclick="switchTab('teams')">Teams</button>
-  <button class="tab" onclick="switchTab('groups')">Groups</button>
-  <button class="tab" onclick="switchTab('bracket')">Bracket</button>
+  <button class="tab active" data-tab="teams" onclick="switchTab('teams')">Teams</button>
+  <button class="tab" data-tab="groups" onclick="switchTab('groups')">Groups</button>
+  <button class="tab" data-tab="bracket" onclick="switchTab('bracket')">Bracket</button>
 </nav>
 
 <div class="content">
 
   <!-- TEAMS TAB -->
   <div id="tab-teams" class="panel active">
-    <div class="card">
-      <div class="card-label">Add Teams</div>
+    <div class="card" id="adminAddTeamCard">
+      <div class="card-label">Add Teams <span style="color:#fef08a;background:#713f12;padding:1px 6px;border-radius:4px;font-size:0.58rem;margin-left:6px">ADMIN</span></div>
       <div class="input-row">
-        <input type="text" id="teamInput" placeholder="Team name  (e.g. Alice & Bob)"
-          onkeydown="if(event.key==='Enter') addTeam()">
-        <button class="btn btn-green" onclick="addTeam()">Add</button>
+        <input type="text" id="teamInput" placeholder="Team name (e.g. Alice & Bob)">
       </div>
+      <div class="input-row">
+        <input type="email" id="teamEmail1" placeholder="Player 1 Gmail (optional)">
+        <input type="email" id="teamEmail2" placeholder="Player 2 Gmail (optional)">
+      </div>
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <button class="btn btn-green" onclick="addTeam()">Add Team</button>
+        <span class="hint">Leave emails blank to link players later.</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">Teams</div>
       <div class="team-list" id="teamList">
         <span class="hint">No teams yet.</span>
       </div>
     </div>
 
-    <div class="card">
-      <div class="card-label">Generate Schedule</div>
+    <div class="card" id="adminGenCard">
+      <div class="card-label">Generate Schedule <span style="color:#fef08a;background:#713f12;padding:1px 6px;border-radius:4px;font-size:0.58rem;margin-left:6px">ADMIN</span></div>
       <p style="font-size:0.85rem; color:#6b7280; margin-bottom:12px; line-height:1.5">
         Teams are split into groups of 3. Each team plays the others in their group.
         Top 2 from each group advance to semi-finals, then the final.
@@ -505,14 +501,41 @@ button.btn {
   </div>
 
 </div>
+</div>
 
-<script>
+<div class="sync-indicator" id="syncIndicator">Syncing…</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import {
+  getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import {
+  getFirestore, doc, onSnapshot, setDoc, getDoc, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+// ── Firebase config ───────────────────────────────────────────────────────────
+const firebaseConfig = {
+  apiKey: "AIzaSyBdPn6sHLhPco7N1eps406lKMmPLQBDSyg",
+  authDomain: "haas-tourney-2026.firebaseapp.com",
+  projectId: "haas-tourney-2026",
+  storageBucket: "haas-tourney-2026.firebasestorage.app",
+  messagingSenderId: "940141507005",
+  appId: "1:940141507005:web:e80eb8e0c034fff75f22d4"
+};
+
+const ADMIN_EMAIL = "patriciaanader@gmail.com";
+
+const fbApp = initializeApp(firebaseConfig);
+const auth = getAuth(fbApp);
+const db = getFirestore(fbApp);
+const tournamentRef = doc(db, "tournaments", "main");
+
 // ── Constants ─────────────────────────────────────────────────────────────────
 const TOURNEY_START    = new Date('2026-04-20T00:00:00');
 const GROUP_DEADLINE   = new Date('2026-04-30T23:59:59');
 const FINALS_DEADLINE  = new Date('2026-05-08T23:59:59');
 
-// Date ranges for match scheduling inputs
 const GROUP_MIN_DATE   = '2026-04-20';
 const GROUP_MAX_DATE   = '2026-04-30';
 const FINALS_MIN_DATE  = '2026-05-04';
@@ -532,49 +555,193 @@ const BERKELEY_COURTS = [
 
 const GROUP_LABELS = ['A','B','C','D','E','F'];
 
-// ── State ─────────────────────────────────────────────────────────────────────
-let state = loadState();
+const EMPTY_STATE = { teams: [], groups: [], semis: [], final: null, generated: false };
 
-function loadState() {
+// ── Client state ──────────────────────────────────────────────────────────────
+let currentUser = null;
+let state = JSON.parse(JSON.stringify(EMPTY_STATE));
+let subscribed = false;
+let syncTimer = null;
+
+// ── Auth ──────────────────────────────────────────────────────────────────────
+const provider = new GoogleAuthProvider();
+
+document.getElementById('googleSigninBtn').addEventListener('click', async () => {
+  const errEl = document.getElementById('signinError');
+  errEl.classList.remove('show');
   try {
-    const s = localStorage.getItem('haas_tourney');
-    if (s) return JSON.parse(s);
-  } catch(e) {}
-  return { teams: [], groups: [], semis: [], final: null, generated: false };
+    await signInWithPopup(auth, provider);
+  } catch (e) {
+    console.error(e);
+    errEl.textContent = 'Sign-in failed: ' + (e.message || e.code || 'unknown error');
+    errEl.classList.add('show');
+  }
+});
+
+onAuthStateChanged(auth, (user) => {
+  currentUser = user;
+  if (user) {
+    document.getElementById('signinGate').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    renderUserChip();
+    if (!subscribed) subscribeToTournament();
+    applyPermissionUI();
+    renderAll();
+  } else {
+    document.getElementById('signinGate').style.display = 'flex';
+    document.getElementById('app').style.display = 'none';
+  }
+});
+
+window.signOutNow = () => signOut(auth);
+
+function renderUserChip() {
+  const el = document.getElementById('userChip');
+  const admin = isAdmin();
+  el.innerHTML = `
+    ${currentUser.photoURL ? `<img src="${currentUser.photoURL}" alt="">` : `<div style="width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;font-size:0.7rem">${(currentUser.displayName||currentUser.email||'?')[0].toUpperCase()}</div>`}
+    <span class="user-name">${escHtml(currentUser.displayName || currentUser.email)}</span>
+    ${admin ? '<span class="admin-badge">ADMIN</span>' : ''}
+    <button onclick="signOutNow()">Sign out</button>
+  `;
 }
-function saveState() { localStorage.setItem('haas_tourney', JSON.stringify(state)); }
+
+function isAdmin() {
+  return currentUser && currentUser.email && currentUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
+}
+
+function userEmail() {
+  return (currentUser && currentUser.email || '').toLowerCase();
+}
+
+// Which team(s) the current user belongs to
+function userTeamIds() {
+  const email = userEmail();
+  if (!email) return [];
+  return (state.teams || [])
+    .filter(t => (t.memberEmails || []).map(e => (e||'').toLowerCase()).includes(email))
+    .map(t => t.id);
+}
+
+// Can the current user edit the given match?
+function canEditMatch(m) {
+  if (isAdmin()) return true;
+  const mine = userTeamIds();
+  return mine.includes(m.t1) || mine.includes(m.t2);
+}
+
+// Can the current user accept this invite? (not the proposer, but on the other team)
+function canAcceptInvite(m) {
+  if (!m.location || !m.date || !m.time) return false;
+  if (m.confirmed) return false;
+  if (isAdmin()) return true;
+  const mine = userTeamIds();
+  if (!mine.length) return false;
+  // If proposedByTeamId is unknown, anyone on either team (but not the sole proposer) can accept
+  if (!m.proposedByTeamId) {
+    return mine.includes(m.t1) || mine.includes(m.t2);
+  }
+  // Must be on the team that did NOT propose
+  if (mine.includes(m.proposedByTeamId)) return false;
+  return mine.includes(m.t1) || mine.includes(m.t2);
+}
+
+function userActingTeamId(m) {
+  if (isAdmin()) return null; // admin doesn't propose as a team
+  const mine = userTeamIds();
+  if (mine.includes(m.t1)) return m.t1;
+  if (mine.includes(m.t2)) return m.t2;
+  return null;
+}
+
+function applyPermissionUI() {
+  const admin = isAdmin();
+  document.getElementById('adminAddTeamCard').style.display = admin ? 'block' : 'none';
+  document.getElementById('adminGenCard').style.display = admin ? 'block' : 'none';
+}
+
+// ── Firestore sync ────────────────────────────────────────────────────────────
+function subscribeToTournament() {
+  subscribed = true;
+  onSnapshot(tournamentRef, (snap) => {
+    if (snap.exists()) {
+      const data = snap.data();
+      state = {
+        teams: data.teams || [],
+        groups: data.groups || [],
+        semis: data.semis || [],
+        final: data.final || null,
+        generated: !!data.generated,
+      };
+    } else {
+      state = JSON.parse(JSON.stringify(EMPTY_STATE));
+      // Admin initializes the doc
+      if (isAdmin()) {
+        setDoc(tournamentRef, { ...EMPTY_STATE, updatedAt: serverTimestamp() }).catch(console.error);
+      }
+    }
+    renderAll();
+  }, (err) => {
+    console.error('Firestore subscribe error', err);
+    alert('Could not load tournament data: ' + (err.message || err.code));
+  });
+}
+
+function saveState() {
+  showSyncing();
+  return setDoc(tournamentRef, { ...state, updatedAt: serverTimestamp() })
+    .catch(err => {
+      console.error(err);
+      alert('Save failed: ' + (err.message || err.code) + '\nYou may not have permission for this action.');
+    });
+}
+
+function showSyncing() {
+  const el = document.getElementById('syncIndicator');
+  el.classList.add('show');
+  clearTimeout(syncTimer);
+  syncTimer = setTimeout(() => el.classList.remove('show'), 800);
+}
 
 // ── Tabs ──────────────────────────────────────────────────────────────────────
-function switchTab(t) {
+window.switchTab = function(t) {
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
   document.getElementById('tab-'+t).classList.add('active');
-  document.querySelectorAll('.tab').forEach(b => {
-    if (b.textContent.toLowerCase().includes(t)) b.classList.add('active');
-  });
-  if (t === 'groups')  renderGroups();
-  if (t === 'bracket') renderBracket();
-  if (t === 'teams')   renderTeams();
+  document.querySelector(`.tab[data-tab="${t}"]`).classList.add('active');
+  renderAll();
+};
+
+function renderAll() {
+  renderTeams();
+  renderGroups();
+  renderBracket();
 }
 
 // ── Teams ─────────────────────────────────────────────────────────────────────
-function addTeam() {
-  const inp = document.getElementById('teamInput');
-  const name = inp.value.trim();
-  if (!name) return;
+window.addTeam = async function() {
+  if (!isAdmin()) { alert('Only the admin can add teams.'); return; }
+  const name = document.getElementById('teamInput').value.trim();
+  const e1 = document.getElementById('teamEmail1').value.trim().toLowerCase();
+  const e2 = document.getElementById('teamEmail2').value.trim().toLowerCase();
+  if (!name) { alert('Enter a team name.'); return; }
   if (state.teams.find(t => t.name === name)) { alert('Team already added.'); return; }
+  const memberEmails = [e1, e2].filter(e => e);
   const id = Date.now();
-  state.teams.push({ id, name });
-  inp.value = '';
-  saveState(); renderTeams();
-}
+  state.teams = [...state.teams, { id, name, memberEmails }];
+  document.getElementById('teamInput').value = '';
+  document.getElementById('teamEmail1').value = '';
+  document.getElementById('teamEmail2').value = '';
+  await saveState();
+};
 
-function removeTeam(id) {
+window.removeTeam = async function(id) {
+  if (!isAdmin()) return;
   if (state.generated && !confirm('Removing a team clears the schedule. Continue?')) return;
-  if (state.generated) { state.groups=[]; state.semis=[]; state.final=null; state.generated=false; }
+  if (state.generated) { state.groups = []; state.semis = []; state.final = null; state.generated = false; }
   state.teams = state.teams.filter(t => t.id !== id);
-  saveState(); renderTeams();
-}
+  await saveState();
+};
 
 function renderTeams() {
   const list    = document.getElementById('teamList');
@@ -583,22 +750,29 @@ function renderTeams() {
 
   if (!state.teams.length) {
     list.innerHTML = '<span class="hint">No teams yet.</span>';
-    preview.textContent = ''; return;
+    if (preview) preview.textContent = '';
+    return;
   }
 
-  const numGroups = Math.floor(state.teams.length / 3);
+  const admin = isAdmin();
   list.innerHTML = state.teams.map((t, i) => {
     const grp = state.generated ? GROUP_LABELS[Math.floor(i/3)] : null;
-    return `<div class="team-chip">
-      <span>${escHtml(t.name)}</span>
+    const memHtml = (t.memberEmails && t.memberEmails.length)
+      ? `<span class="t-meta">· ${t.memberEmails.map(e => escHtml(e)).join(', ')}</span>`
+      : `<span class="t-meta" style="color:#f59e0b">· no emails linked</span>`;
+    return `<div class="team-row">
+      <span class="t-name">${escHtml(t.name)}</span>
       ${grp ? `<span class="group-badge">Group ${grp}</span>` : ''}
-      <button onclick="removeTeam(${t.id})" title="Remove">×</button>
+      ${memHtml}
+      <span class="t-spacer"></span>
+      ${admin ? `<button class="remove" onclick="removeTeam(${t.id})" title="Remove">×</button>` : ''}
     </div>`;
   }).join('');
 
+  if (!preview) return;
   const n = state.teams.length;
   if (n > 0 && n % 3 === 0) {
-    preview.textContent = `${n} teams → ${Math.floor(n/3)} groups of 3 · ${n*(n/3-1)/1} group matches + semis + final`;
+    preview.textContent = `${n} teams → ${n/3} groups of 3`;
     note.textContent = state.generated ? '✓ Schedule generated — regenerating clears all scores' : '';
   } else if (n > 0) {
     preview.textContent = `${n} teams — needs a multiple of 3 (add ${3 - (n%3)} more)`;
@@ -607,14 +781,15 @@ function renderTeams() {
 }
 
 // ── Schedule generation ───────────────────────────────────────────────────────
-function generateSchedule() {
+window.generateSchedule = async function() {
+  if (!isAdmin()) { alert('Only the admin can generate the schedule.'); return; }
   const n = state.teams.length;
   if (n < 3)       { alert('Add at least 3 teams.'); return; }
   if (n % 3 !== 0) { alert(`Need a multiple of 3 teams. Add ${3-(n%3)} more.`); return; }
   if (state.generated && !confirm('This clears all current scores. Continue?')) return;
 
   const numGroups = n / 3;
-  state.groups = [];
+  const groups = [];
   let matchId = 1;
 
   for (let g = 0; g < numGroups; g++) {
@@ -627,32 +802,35 @@ function generateSchedule() {
           id: matchId++,
           t1: teamSlice[i].id, t2: teamSlice[j].id,
           score1: '', score2: '', complete: false,
-          date: '', time: '', location: '', confirmed: false
+          date: '', time: '', location: '',
+          confirmed: false, proposedByTeamId: null,
         });
       }
     }
-    state.groups.push({ label, teamIds: teamSlice.map(t=>t.id), matches });
+    groups.push({ label, teamIds: teamSlice.map(t=>t.id), matches });
   }
 
-  // Initialize knockouts
+  state.groups = groups;
   state.semis = [
     { id:'SF1', label:'Semi-Final 1', seed1:'A1', seed2:'B2',
-      t1:null, t2:null, score1:'', score2:'', complete:false, date:'', time:'', location:'', confirmed:false },
+      t1:null, t2:null, score1:'', score2:'', complete:false,
+      date:'', time:'', location:'', confirmed:false, proposedByTeamId:null },
     { id:'SF2', label:'Semi-Final 2', seed1:'B1', seed2:'A2',
-      t1:null, t2:null, score1:'', score2:'', complete:false, date:'', time:'', location:'', confirmed:false },
+      t1:null, t2:null, score1:'', score2:'', complete:false,
+      date:'', time:'', location:'', confirmed:false, proposedByTeamId:null },
   ];
-  state.final = { id:'F', label:'Final', t1:null, t2:null, score1:'', score2:'', complete:false, date:'', time:'', location:'', confirmed:false };
+  state.final = { id:'F', label:'Final', t1:null, t2:null, score1:'', score2:'', complete:false,
+    date:'', time:'', location:'', confirmed:false, proposedByTeamId:null };
   state.generated = true;
-  saveState(); renderTeams();
+  await saveState();
   alert(`Schedule generated! Groups: ${GROUP_LABELS.slice(0,numGroups).join(', ')}`);
-}
+};
 
 // ── Knockout auto-populate ────────────────────────────────────────────────────
 function autoPopulateKnockout() {
-  if (!state.generated) return;
-
-  // Seed knockout from group standings
-  const seedings = {}; // e.g. {A1: teamId, A2: teamId, B1: teamId, B2: teamId}
+  if (!state.generated) return false;
+  let changed = false;
+  const seedings = {};
   state.groups.forEach(g => {
     const allDone = g.matches.every(m => m.complete);
     if (!allDone) return;
@@ -661,22 +839,18 @@ function autoPopulateKnockout() {
       seedings[g.label + (i+1)] = s.id;
     });
   });
-
   state.semis.forEach(sf => {
-    if (!sf.t1 && seedings[sf.seed1]) sf.t1 = seedings[sf.seed1];
-    if (!sf.t2 && seedings[sf.seed2]) sf.t2 = seedings[sf.seed2];
+    if (!sf.t1 && seedings[sf.seed1]) { sf.t1 = seedings[sf.seed1]; changed = true; }
+    if (!sf.t2 && seedings[sf.seed2]) { sf.t2 = seedings[sf.seed2]; changed = true; }
   });
-
-  // Seed final from semis
   state.semis.forEach((sf, i) => {
     if (sf.complete) {
       const w = matchWinnerId(sf);
-      if (i === 0 && !state.final.t1) state.final.t1 = w;
-      if (i === 1 && !state.final.t2) state.final.t2 = w;
+      if (i === 0 && !state.final.t1) { state.final.t1 = w; changed = true; }
+      if (i === 1 && !state.final.t2) { state.final.t2 = w; changed = true; }
     }
   });
-
-  saveState();
+  return changed;
 }
 
 // ── Group standings ───────────────────────────────────────────────────────────
@@ -691,34 +865,17 @@ function getGroupStandings(group) {
     const lid = wid === m.t1 ? m.t2 : m.t1;
     teamStats[wid].wins++;
     teamStats[lid].losses++;
-    const diff = setDiff(m.score1);
-    if (diff !== 0) {
-      const s1w = m.score1.split(',').filter(p => { const[a,b]=p.trim().split('-').map(Number);return a>b; }).length;
-      const s1l = m.score1.split(',').length - s1w;
-      teamStats[m.t1].setsW += s1w; teamStats[m.t1].setsL += s1l;
-      teamStats[m.t2].setsW += s1l; teamStats[m.t2].setsL += s1w;
-    } else {
-      teamStats[wid].setsW++; teamStats[lid].setsL++;
-    }
+    teamStats[wid].setsW++; teamStats[lid].setsL++;
   });
   return Object.values(teamStats).sort((a,b) =>
     b.wins - a.wins || (b.setsW-b.setsL) - (a.setsW-a.setsL)
   );
 }
 
-// ── Score helpers ─────────────────────────────────────────────────────────────
 function matchWinnerId(m) {
   const s1 = parseFloat(m.score1), s2 = parseFloat(m.score2);
   if (!isNaN(s1) && !isNaN(s2)) return s1 > s2 ? m.t1 : m.t2;
-  return setDiff(m.score1) >= 0 ? m.t1 : m.t2;
-}
-
-function setDiff(s1) {
-  const parts = s1.split(',');
-  if (parts.length < 2) return 0;
-  let w=0,l=0;
-  parts.forEach(p=>{ const[a,b]=p.trim().split('-').map(Number); if(!isNaN(a)&&!isNaN(b)) a>b?w++:l++; });
-  return w-l;
+  return m.t1;
 }
 
 function teamName(id) {
@@ -731,7 +888,6 @@ function daysLeft(deadline) {
   return Math.ceil((deadline - new Date()) / 86400000);
 }
 function deadlineBannerHtml(stage) {
-  // stage: 'groups' or 'bracket'
   const isGroups = stage === 'groups';
   const deadline = isGroups ? GROUP_DEADLINE : FINALS_DEADLINE;
   const dateLabel = isGroups ? 'Apr 30, 2026' : 'May 8, 2026';
@@ -754,7 +910,6 @@ function deadlineTag(stage) {
   return              `<span class="deadline-tag ok">${dateLabel}</span>`;
 }
 
-// ── Court options HTML ────────────────────────────────────────────────────────
 function courtOptions(selected) {
   return BERKELEY_COURTS.map(c =>
     `<option value="${escA(c)}" ${c===selected?'selected':''}>${c||'— court —'}</option>`
@@ -779,7 +934,6 @@ function renderGroups() {
     const done  = g.matches.filter(m => m.complete).length;
     const total = g.matches.length;
 
-    // Standings mini-table
     let standHtml = `<table class="standings-mini"><thead><tr>
       <th colspan="2">Team</th>
       <th class="c">W</th><th class="c">L</th>
@@ -795,10 +949,11 @@ function renderGroups() {
     });
     standHtml += '</tbody></table>';
 
-    // Match cards
     let matchHtml = '';
     g.matches.forEach(m => {
       const w = m.complete ? matchWinnerId(m) : null;
+      const canEdit = canEditMatch(m);
+      const disabled = canEdit ? '' : 'disabled';
       matchHtml += `<div class="group-match ${m.complete?'complete':''}">
         <div class="match-teams">
           <div class="team-nm ${m.complete?(w===m.t1?'winner':'loser'):''}">${escHtml(teamName(m.t1))}</div>
@@ -809,39 +964,38 @@ function renderGroups() {
           <div class="meta-row">
             <div class="meta-item">
               <span>📍</span>
-              <select class="${m.location?'':'unset'}" onchange="saveGroupField('${g.label}',${m.id},'location',this.value)">
+              <select class="${m.location?'':'unset'}" ${disabled}
+                onchange="saveGroupField('${g.label}',${m.id},'location',this.value)">
                 ${courtOptions(m.location)}
               </select>
             </div>
             <div class="meta-item">
               <span>📅</span>
               <input type="date" class="${m.date?'':'unset'}" value="${escA(m.date||'')}"
-                min="${GROUP_MIN_DATE}" max="${GROUP_MAX_DATE}"
+                min="${GROUP_MIN_DATE}" max="${GROUP_MAX_DATE}" ${disabled}
                 onchange="saveGroupField('${g.label}',${m.id},'date',this.value)">
             </div>
             <div class="meta-item">
               <span>⏰</span>
-              <input type="time" class="${m.time?'':'unset'}" value="${escA(m.time||'')}"
+              <input type="time" class="${m.time?'':'unset'}" value="${escA(m.time||'')}" ${disabled}
                 onchange="saveGroupField('${g.label}',${m.id},'time',this.value)">
             </div>
             ${!m.complete ? deadlineTag('groups') : ''}
           </div>
           ${inviteRowHtml(m, 'group', g.label)}
+          ${!canEdit && !m.complete ? '<div class="read-only-note">Read-only — you\'re not on either team.</div>' : ''}
         </div>
         <div class="match-section score-section">
-          <div class="section-label">Score</div>
           <div class="score-row">
             ${m.complete
               ? `<span class="score-badge">✓ ${escHtml(m.score1)}–${escHtml(m.score2)}</span>
-                 <button class="btn btn-outline btn-xs" onclick="editGroupMatch('${g.label}',${m.id})">Edit</button>`
+                 ${canEdit ? `<button class="btn btn-outline btn-xs" onclick="editGroupMatch('${g.label}',${m.id})">Edit</button>` : ''}`
               : `<div class="score-wrap">
-                   <input type="text" id="gs1-${m.id}" value="${escA(m.score1)}" placeholder="0"
-                     onkeydown="if(event.key==='Enter')saveGroupMatch('${g.label}',${m.id})">
+                   <input type="text" id="gs1-${m.id}" value="${escA(m.score1)}" placeholder="0" ${disabled}>
                    <span class="score-dash">–</span>
-                   <input type="text" id="gs2-${m.id}" value="${escA(m.score2)}" placeholder="0"
-                     onkeydown="if(event.key==='Enter')saveGroupMatch('${g.label}',${m.id})">
+                   <input type="text" id="gs2-${m.id}" value="${escA(m.score2)}" placeholder="0" ${disabled}>
                  </div>
-                 <button class="btn btn-green btn-xs" onclick="saveGroupMatch('${g.label}',${m.id})">Save</button>`
+                 <button class="btn btn-green btn-xs" onclick="saveGroupMatch('${g.label}',${m.id})" ${disabled}>Save Score</button>`
             }
           </div>
         </div>
@@ -863,63 +1017,64 @@ function renderGroups() {
   container.innerHTML = html;
 }
 
-function saveGroupMatch(groupLabel, matchId) {
+window.saveGroupMatch = async function(groupLabel, matchId) {
   const g = state.groups.find(g => g.label === groupLabel);
   if (!g) return;
   const m = g.matches.find(m => m.id === matchId);
   if (!m) return;
+  if (!canEditMatch(m)) { alert('You cannot edit this match.'); return; }
   const s1 = document.getElementById('gs1-'+matchId)?.value.trim();
   const s2 = document.getElementById('gs2-'+matchId)?.value.trim();
   if (!s1 || !s2) { alert('Enter scores for both teams.'); return; }
   if (s1 === s2)  { alert('Scores cannot be tied.'); return; }
   m.score1 = s1; m.score2 = s2; m.complete = true;
   autoPopulateKnockout();
-  saveState(); renderGroups();
-}
+  await saveState();
+};
 
-function editGroupMatch(groupLabel, matchId) {
+window.editGroupMatch = async function(groupLabel, matchId) {
   const g = state.groups.find(g => g.label === groupLabel);
   const m = g?.matches.find(m => m.id === matchId);
   if (!m) return;
+  if (!canEditMatch(m)) return;
   m.complete = false; m.score1 = ''; m.score2 = '';
-  // Clear dependent knockout slots
   clearKnockoutFromGroup(groupLabel);
-  saveState(); renderGroups();
-}
+  await saveState();
+};
 
-function saveGroupField(groupLabel, matchId, field, value) {
+window.saveGroupField = async function(groupLabel, matchId, field, value) {
   const g = state.groups.find(g => g.label === groupLabel);
   const m = g?.matches.find(m => m.id === matchId);
   if (!m) return;
+  if (!canEditMatch(m)) return;
   m[field] = value;
   if (field === 'location' || field === 'date' || field === 'time') {
     m.confirmed = false;
+    m.proposedByTeamId = userActingTeamId(m);
   }
-  saveState(); renderGroups();
-}
-
-function confirmGroupMatch(groupLabel, matchId) {
-  const g = state.groups.find(g => g.label === groupLabel);
-  const m = g?.matches.find(m => m.id === matchId);
-  if (!m) return;
-  if (!m.location || !m.date || !m.time) {
-    alert('Location, date, and time must all be set before accepting.');
-    return;
-  }
-  m.confirmed = true;
-  saveState(); renderGroups();
-}
+  await saveState();
+};
 
 function clearKnockoutFromGroup(groupLabel) {
-  // Clear SF slots that depended on this group
   state.semis.forEach(sf => {
     if (sf.seed1.startsWith(groupLabel) || sf.seed2.startsWith(groupLabel)) {
       sf.t1 = null; sf.t2 = null; sf.score1=''; sf.score2=''; sf.complete=false;
     }
   });
-  state.final.t1 = null; state.final.t2 = null;
-  state.final.score1 = ''; state.final.score2 = ''; state.final.complete = false;
+  if (state.final) {
+    state.final.t1 = null; state.final.t2 = null;
+    state.final.score1 = ''; state.final.score2 = ''; state.final.complete = false;
+  }
 }
+
+window.confirmGroupMatch = async function(groupLabel, matchId) {
+  const g = state.groups.find(g => g.label === groupLabel);
+  const m = g?.matches.find(m => m.id === matchId);
+  if (!m) return;
+  if (!canAcceptInvite(m)) { alert('You cannot accept this invitation.'); return; }
+  m.confirmed = true;
+  await saveState();
+};
 
 // ── Bracket rendering ─────────────────────────────────────────────────────────
 function renderBracket() {
@@ -933,13 +1088,13 @@ function renderBracket() {
     return;
   }
 
-  autoPopulateKnockout();
+  // Auto-populate (admin only writes this back; others just see computed)
+  const changed = autoPopulateKnockout();
+  if (changed && isAdmin()) saveState();
 
-  // Group summaries
   let groupSummaryHtml = `<div class="card" style="margin-bottom:16px">
     <div class="card-label">Group Results</div>
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px">`;
-
   state.groups.forEach(g => {
     const standings = getGroupStandings(g);
     const allDone = g.matches.every(m => m.complete);
@@ -963,7 +1118,6 @@ function renderBracket() {
   });
   groupSummaryHtml += '</div></div>';
 
-  // Build knockout bracket match boxes
   function matchBox(m, label) {
     const t1name = m.t1 ? teamName(m.t1) : 'TBD';
     const t2name = m.t2 ? teamName(m.t2) : 'TBD';
@@ -972,6 +1126,8 @@ function renderBracket() {
     const t2cls = m.t2 ? (m.complete ? (w===m.t2?'winner':'loser') : '') : 'tbd';
     const t1score = m.complete ? `<span class="b-score ${w===m.t1?'winner':''}">${escHtml(m.score1)}</span>` : '';
     const t2score = m.complete ? `<span class="b-score ${w===m.t2?'winner':''}">${escHtml(m.score2)}</span>` : '';
+    const canEdit = canEditMatch(m);
+    const disabled = canEdit ? '' : 'disabled';
 
     return `<div class="b-match ${m.complete?'complete':''}">
       <div class="b-match-label">${label}</div>
@@ -985,31 +1141,28 @@ function renderBracket() {
       </div>
       <div class="b-match-footer" style="background:#f9fafb;border-top:1px solid #f3f4f6">
         <div class="b-meta">
-          <select class="${m.location?'':'unset'}" onchange="saveKnockoutField('${m.id}','location',this.value)">
+          <select class="${m.location?'':'unset'}" ${disabled}
+            onchange="saveKnockoutField('${m.id}','location',this.value)">
             ${courtOptions(m.location||'')}
           </select>
           <input type="date" class="${m.date?'':'unset'}" value="${escA(m.date||'')}"
-            min="${FINALS_MIN_DATE}" max="${FINALS_MAX_DATE}"
+            min="${FINALS_MIN_DATE}" max="${FINALS_MAX_DATE}" ${disabled}
             onchange="saveKnockoutField('${m.id}','date',this.value)">
-          <input type="time" class="${m.time?'':'unset'}" value="${escA(m.time||'')}"
-            onchange="saveKnockoutField('${m.id}','time',this.value)"
-            style="width:82px">
+          <input type="time" class="${m.time?'':'unset'}" value="${escA(m.time||'')}" ${disabled}
+            onchange="saveKnockoutField('${m.id}','time',this.value)">
         </div>
         ${inviteRowHtml(m, 'knockout')}
       </div>
       <div class="b-match-footer" style="border-top:1px solid #f3f4f6">
-        <div style="font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:#9ca3af;margin-bottom:6px">Score</div>
         <div class="b-score-entry">
           ${m.complete
             ? `<span class="score-badge" style="font-size:0.75rem">✓ ${escHtml(m.score1)}–${escHtml(m.score2)}</span>
-               <button class="btn btn-outline btn-xs" onclick="editKnockout('${m.id}')">Edit</button>`
+               ${canEdit ? `<button class="btn btn-outline btn-xs" onclick="editKnockout('${m.id}')">Edit</button>` : ''}`
             : m.t1 && m.t2
-              ? `<input type="text" id="ks1-${m.id}" value="${escA(m.score1)}" placeholder="0"
-                   onkeydown="if(event.key==='Enter')saveKnockout('${m.id}')">
+              ? `<input type="text" id="ks1-${m.id}" value="${escA(m.score1)}" placeholder="0" ${disabled}>
                  <span class="b-score-sep">–</span>
-                 <input type="text" id="ks2-${m.id}" value="${escA(m.score2)}" placeholder="0"
-                   onkeydown="if(event.key==='Enter')saveKnockout('${m.id}')">
-                 <button class="btn btn-green btn-xs" onclick="saveKnockout('${m.id}')">Save</button>`
+                 <input type="text" id="ks2-${m.id}" value="${escA(m.score2)}" placeholder="0" ${disabled}>
+                 <button class="btn btn-green btn-xs" onclick="saveKnockout('${m.id}')" ${disabled}>Save Score</button>`
               : `<span style="font-size:0.78rem;color:#d1d5db;font-style:italic">Waiting for teams</span>`
           }
         </div>
@@ -1021,30 +1174,23 @@ function renderBracket() {
   const sf2Box = matchBox(state.semis[1], 'Semi-Final 2');
   const finalBox = matchBox(state.final, 'Final');
 
-  const champId = state.final.complete ? matchWinnerId(state.final) : null;
+  const champId = state.final && state.final.complete ? matchWinnerId(state.final) : null;
   const champName = champId ? teamName(champId) : null;
 
   const bracketHtml = `
     <div class="card">
       <div class="card-label">Knockout Stage</div>
       <div class="bracket-visual">
-        <!-- Semis -->
         <div class="bracket-sf-col">
           <div class="bracket-sf-slot">${sf1Box}</div>
           <div class="bracket-sf-slot">${sf2Box}</div>
         </div>
-        <!-- Lines: semis → final -->
         <div class="bracket-connector">
           <div class="conn-top"></div>
           <div class="conn-bot"></div>
         </div>
-        <!-- Final -->
-        <div class="bracket-final-col">
-          ${finalBox}
-        </div>
-        <!-- Line: final → champ -->
+        <div class="bracket-final-col">${finalBox}</div>
         <div class="bracket-champ-conn"></div>
-        <!-- Champion -->
         <div class="champion-box">
           <div class="champ-trophy">🏆</div>
           <div class="champ-label">Champion</div>
@@ -1055,62 +1201,68 @@ function renderBracket() {
 
   container.innerHTML = groupSummaryHtml + bracketHtml;
 
-  // Reset button
-  container.innerHTML += `<div class="bottom-row">
-    <button class="btn btn-outline btn-sm" onclick="confirmReset()">Reset Everything</button>
-  </div>`;
+  if (isAdmin()) {
+    container.innerHTML += `<div class="bottom-row">
+      <button class="btn btn-outline btn-sm" onclick="confirmReset()">Reset Everything</button>
+    </div>`;
+  }
 }
 
-function saveKnockout(id) {
+window.saveKnockout = async function(id) {
   const m = findKnockout(id);
   if (!m) return;
+  if (!canEditMatch(m)) { alert('You cannot edit this match.'); return; }
   const s1 = document.getElementById('ks1-'+id)?.value.trim();
   const s2 = document.getElementById('ks2-'+id)?.value.trim();
   if (!s1 || !s2) { alert('Enter scores for both teams.'); return; }
   if (s1 === s2)  { alert('Scores cannot be tied.'); return; }
   m.score1 = s1; m.score2 = s2; m.complete = true;
   autoPopulateKnockout();
-  saveState(); renderBracket();
-}
+  await saveState();
+};
 
-function editKnockout(id) {
+window.editKnockout = async function(id) {
   const m = findKnockout(id);
   if (!m) return;
+  if (!canEditMatch(m)) return;
   m.complete = false; m.score1 = ''; m.score2 = '';
-  // Clear final if editing a semi
   if (id === 'SF1' || id === 'SF2') {
     state.final.t1 = null; state.final.t2 = null;
-    state.final.score1=''; state.final.score2=''; state.final.complete=false;
+    state.final.score1 = ''; state.final.score2 = ''; state.final.complete = false;
   }
-  saveState(); renderBracket();
-}
+  await saveState();
+};
 
-function saveKnockoutField(id, field, value) {
+window.saveKnockoutField = async function(id, field, value) {
   const m = findKnockout(id);
   if (!m) return;
+  if (!canEditMatch(m)) return;
   m[field] = value;
   if (field === 'location' || field === 'date' || field === 'time') {
     m.confirmed = false;
+    m.proposedByTeamId = userActingTeamId(m);
   }
-  saveState(); renderBracket();
-}
+  await saveState();
+};
 
-function confirmKnockoutMatch(id) {
+window.confirmKnockoutMatch = async function(id) {
   const m = findKnockout(id);
   if (!m) return;
-  if (!m.location || !m.date || !m.time) {
-    alert('Location, date, and time must all be set before accepting.');
-    return;
-  }
+  if (!canAcceptInvite(m)) { alert('You cannot accept this invitation.'); return; }
   m.confirmed = true;
-  saveState(); renderBracket();
+  await saveState();
+};
+
+function findKnockout(id) {
+  if (id === 'F')   return state.final;
+  if (id === 'SF1') return state.semis[0];
+  if (id === 'SF2') return state.semis[1];
+  return null;
 }
 
 // ── Invitation row ────────────────────────────────────────────────────────────
 function inviteRowHtml(m, kind, groupLabel) {
-  // For knockout matches, only show invite when both teams are known
   if (kind === 'knockout' && (!m.t1 || !m.t2)) return '';
-  // Once the match is complete, don't bother showing the invite row
   if (m.complete) return '';
 
   const hasAll = !!(m.location && m.date && m.time);
@@ -1121,12 +1273,20 @@ function inviteRowHtml(m, kind, groupLabel) {
     </div>`;
   }
   if (hasAll) {
+    const canAccept = canAcceptInvite(m);
     const onclick = kind === 'group'
       ? `confirmGroupMatch('${groupLabel}',${m.id})`
       : `confirmKnockoutMatch('${m.id}')`;
+    const mine = userTeamIds();
+    const proposedByMyTeam = m.proposedByTeamId && mine.includes(m.proposedByTeamId);
+    const msg = canAccept
+      ? 'Proposed — waiting for you to accept'
+      : (proposedByMyTeam
+          ? 'Waiting for opponent to accept'
+          : 'Proposed — opponent must accept');
     return `<div class="invite-row">
-      <span class="invite-msg pending">Proposed — opponent must accept</span>
-      <button class="btn btn-accept btn-xs" onclick="${onclick}">Accept Invitation</button>
+      <span class="invite-msg ${canAccept ? 'pending' : 'waiting'}">${msg}</span>
+      <button class="btn btn-accept btn-xs" onclick="${onclick}" ${canAccept ? '' : 'disabled'}>Accept Invitation</button>
     </div>`;
   }
   const missing = [];
@@ -1138,33 +1298,27 @@ function inviteRowHtml(m, kind, groupLabel) {
   </div>`;
 }
 
-function findKnockout(id) {
-  if (id === 'F')   return state.final;
-  if (id === 'SF1') return state.semis[0];
-  if (id === 'SF2') return state.semis[1];
-  return null;
-}
-
 // ── Reset ─────────────────────────────────────────────────────────────────────
-function confirmReset() {
+window.confirmReset = async function() {
+  if (!isAdmin()) return;
   if (confirm('Reset everything? Deletes all teams, matches, and scores.')) {
-    state = { teams:[], groups:[], semis:[], final:null, generated:false };
-    saveState();
+    state = JSON.parse(JSON.stringify(EMPTY_STATE));
+    await saveState();
     switchTab('teams');
   }
-}
+};
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 function escHtml(s) {
-  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 function escA(s) {
-  return String(s||'').replace(/'/g,"\\'").replace(/"/g,'&quot;');
+  return String(s==null?'':s).replace(/'/g,"\\'").replace(/"/g,'&quot;');
 }
 
-// ── Init ──────────────────────────────────────────────────────────────────────
-renderTeams();
-if (state.generated) document.getElementById('generateNote').textContent = '✓ Schedule generated';
+// Show sign-in gate initially; auth listener will flip this
+document.getElementById('signinGate').style.display = 'flex';
 </script>
+
 </body>
 </html>
