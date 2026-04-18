@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tennis Round Robin</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #0f4c2a;
+    min-height: 100vh;
+    color: #1a1a1a;
+  }
+
+  header {
+    background: #0a3a1f;
+    color: white;
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  }
+  header h1 { font-size: 1.4rem; font-weight: 700; flex: 1; }
+  header .header-right { display: flex; gap: 8px; align-items: center; }
+
+  .tabs {
+    display: flex;
+    background: #0a3a1f;
+    padding: 0 24px;
+    gap: 4px;
+  }
+  .tab {
+    padding: 10px 18px;
+    border: none;
+    background: transparent;
+    color: rgba(255,255,255,0.6);
+    cursor: pointer;
+    font-size: 0.88rem;
+    font-weight: 500;
+    border-bottom: 3px solid transparent;
+    transition: all 0.15s;
+  }
+  .tab:hover { color: white; }
+  .tab.active { color: #7dff9a; border-bottom-color: #7dff9a; }
+
+  .content {
+    max-width: 860px;
+    margin: 28px auto;
+    padding: 0 16px;
+  }
+
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  .card {
+    background: white;
+    border-radius: 12px;
+    padding: 22px;
+    margin-bottom: 18px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+  }
+  .card h2 {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    margin-bottom: 14px;
+  }
+
+  /* Deadline banner */
+  .deadline-banner {
+    border-radius: 10px;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .deadline-banner.urgent { background: #fff3e0; color: #e65100; border: 1.5px solid #ffcc80; }
+  .deadline-banner.ok { background: #e8f5e9; color: #2e7d32; border: 1.5px solid #a5d6a7; }
+  .deadline-banner.overdue { background: #ffebee; color: #c62828; border: 1.5px solid #ef9a9a; }
+
+  /* Inputs */
+  input[type="text"], input[type="date"] {
+    padding: 9px 12px;
+    border: 1.5px solid #ddd;
+    border-radius: 8px;
+    font-size: 0.92rem;
+    outline: none;
+    transition: border-color 0.15s;
+    font-family: inherit;
+  }
+  input[type="text"]:focus, input[type="date"]:focus { border-color: #0f4c2a; }
+
+  button.btn {
+    padding: 9px 16px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.88rem;
+    font-weight: 600;
+    transition: all 0.15s;
+    font-family: inherit;
+  }
+  .btn-green { background: #0f4c2a; color: white; }
+  .btn-green:hover { background: #0a3a1f; }
+  .btn-blue { background: #1a73e8; color: white; }
+  .btn-blue:hover { background: #1558b0; }
+  .btn-purple { background: #1a73e8; color: white; }
+  .btn-purple:hover { background: #1558b0; }
+  .btn-outline { background: transparent; border: 1.5px solid #ccc; color: #555; }
+  .btn-outline:hover { border-color: #888; color: #222; }
+  .btn-sm { padding: 5px 11px; font-size: 0.8rem; border-radius: 6px; }
+  .btn-xs { padding: 3px 8px; font-size: 0.75rem; border-radius: 5px; }
+
+  /* Players */
+  .row { display: flex; gap: 10px; margin-bottom: 14px; }
+  .row input { flex: 1; }
+
+  .player-list { display: flex; flex-wrap: wrap; gap: 8px; }
+  .player-chip {
+    display: flex; align-items: center; gap: 6px;
+    background: #f0f8f0; border: 1.5px solid #c8e6c9;
+    border-radius: 20px; padding: 5px 12px; font-size: 0.88rem;
+  }
+  .player-chip button {
+    background: none; border: none; color: #aaa;
+    cursor: pointer; font-size: 1rem; line-height: 1; padding: 0;
+  }
+  .player-chip button:hover { color: #e53935; }
+
+  .note { font-size: 0.82rem; color: #999; }
+
+  /* Match cards */
+  .match-group { margin-bottom: 22px; }
+  .match-group-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .match-group-header h3 {
+    font-size: 0.78rem; text-transform: uppercase;
+    letter-spacing: 0.5px; color: #aaa; font-weight: 700;
+  }
+
+  .match-card {
+    background: white;
+    border: 1.5px solid #e8e8e8;
+    border-radius: 10px;
+    margin-bottom: 8px;
+    overflow: hidden;
+    transition: border-color 0.15s;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+  .match-card.complete { border-color: #c8e6c9; }
+  .match-card.overdue-match { border-color: #ffcc80; }
+
+  .match-main {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr auto;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+  }
+
+  .player-name { font-weight: 600; font-size: 0.92rem; }
+  .player-name.winner { color: #0a7a35; }
+  .player-name.loser { color: #aaa; }
+
+  .vs { color: #ccc; font-size: 0.78rem; font-weight: 700; }
+
+  .match-actions { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+
+  .score-input-wrap { display: flex; align-items: center; gap: 5px; }
+  .score-input-wrap input { width: 46px; text-align: center; padding: 5px 6px; font-size: 0.88rem; }
+  .score-sep { color: #bbb; font-weight: 700; font-size: 0.9rem; }
+
+  .badge {
+    display: inline-block; padding: 3px 9px;
+    border-radius: 10px; font-size: 0.75rem; font-weight: 700;
+  }
+  .badge-green { background: #e8f5e9; color: #2e7d32; }
+  .badge-overdue { background: #fff3e0; color: #e65100; }
+
+  /* Match meta row (location + deadline) */
+  .match-meta {
+    border-top: 1px solid #f0f0f0;
+    padding: 7px 14px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: #fafafa;
+    font-size: 0.8rem;
+    color: #888;
+  }
+
+  .location-display {
+    display: flex; align-items: center; gap: 5px; cursor: pointer;
+    color: #666; transition: color 0.15s;
+  }
+  .location-display:hover { color: #0f4c2a; }
+  .location-display.empty { color: #bbb; font-style: italic; }
+
+  .location-edit {
+    display: flex; align-items: center; gap: 6px; flex: 1;
+  }
+  .location-edit select { flex: 1; padding: 4px 8px; font-size: 0.8rem; border: 1.5px solid #ddd; border-radius: 6px; outline: none; background: white; cursor: pointer; }
+  .location-edit select:focus { border-color: #0f4c2a; }
+
+  .deadline-tag {
+    display: flex; align-items: center; gap: 4px;
+    margin-left: auto; white-space: nowrap;
+  }
+  .deadline-tag.late { color: #e65100; font-weight: 600; }
+  .deadline-tag.soon { color: #f57c00; font-weight: 600; }
+  .deadline-tag.ok { color: #888; }
+
+  /* Filter bar */
+  .filter-row { display: flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap; }
+  .filter-btn {
+    padding: 5px 13px; border: 1.5px solid #ddd;
+    border-radius: 20px; background: white; cursor: pointer;
+    font-size: 0.8rem; color: #666; transition: all 0.15s;
+  }
+  .filter-btn.active, .filter-btn:hover {
+    background: #0f4c2a; border-color: #0f4c2a; color: white;
+  }
+
+  /* Standings */
+  table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+  th {
+    text-align: left; padding: 9px 12px;
+    background: #f5f5f5; color: #666;
+    font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.4px;
+    border-bottom: 2px solid #eee;
+  }
+  th.num { text-align: center; }
+  td { padding: 11px 12px; border-bottom: 1px solid #f2f2f2; }
+  td.num { text-align: center; }
+  tr:last-child td { border-bottom: none; }
+  tr:nth-child(1) td { background: #fffde7; }
+  tr:nth-child(2) td { background: #f9f9f9; }
+
+  .rank {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 22px; height: 22px; border-radius: 50%;
+    font-size: 0.75rem; font-weight: 700;
+  }
+  .rank-1 { background: #ffd700; color: #7a5c00; }
+  .rank-2 { background: #e0e0e0; color: #555; }
+  .rank-3 { background: #cd7f32; color: white; }
+  .rank-other { background: #f0f0f0; color: #999; }
+
+  .pct-bar { display: flex; align-items: center; gap: 8px; }
+  .pct-track { flex: 1; height: 5px; background: #eee; border-radius: 3px; overflow: hidden; }
+  .pct-fill { height: 100%; background: #0f4c2a; border-radius: 3px; transition: width 0.3s; }
+
+  .empty-state { text-align: center; padding: 36px; color: #bbb; font-size: 0.9rem; }
+
+  .reset-row { display: flex; justify-content: flex-end; margin-top: 8px; gap: 8px; }
+
+  @media (max-width: 580px) {
+    .match-main { grid-template-columns: 1fr 1fr; }
+    .match-main .vs { display: none; }
+    .match-actions { grid-column: 1 / 3; justify-content: center; }
+    .score-input-wrap { grid-column: 1 / 3; justify-content: center; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <span>🎾</span>
+  <h1>Tennis Round Robin</h1>
+  <div class="header-right">
+    <button class="btn btn-purple btn-sm" onclick="downloadPlayerView()">Share with Players</button>
+  </div>
+</header>
+
+<nav class="tabs">
+  <button class="tab active" onclick="switchTab('players')">Players</button>
+  <button class="tab" onclick="switchTab('matches')">Matches</button>
+  <button class="tab" onclick="switchTab('standings')">Standings</button>
+</nav>
+
+
+<div class="content">
+
+  <!-- PLAYERS TAB -->
+  <div id="tab-players" class="panel active">
+    <div class="card">
+      <h2>Players</h2>
+      <div class="row">
+        <input type="text" id="playerNameInput" placeholder="Player name" onkeydown="if(event.key==='Enter') addPlayer()">
+        <button class="btn btn-green" onclick="addPlayer()">Add</button>
+      </div>
+      <div class="player-list" id="playerList">
+        <span class="note">No players yet.</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Generate Schedule</h2>
+      <p style="color:#666; font-size:0.87rem; margin-bottom:14px;">
+        Every player faces every other player once. Matches are grouped into rounds.
+      </p>
+      <div id="schedulePreview" class="note" style="margin-bottom:12px;"></div>
+      <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+        <button class="btn btn-blue" onclick="generateSchedule()">Generate Schedule</button>
+        <span class="note" id="generateNote"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- MATCHES TAB -->
+  <div id="tab-matches" class="panel">
+    <div id="deadlineBanner"></div>
+    <div class="filter-row" id="roundFilter"></div>
+    <div id="matchesContainer">
+      <div class="empty-state">Generate a schedule first in the Players tab.</div>
+    </div>
+  </div>
+
+  <!-- STANDINGS TAB -->
+  <div id="tab-standings" class="panel">
+    <div class="card">
+      <h2>Standings</h2>
+      <div id="standingsTable">
+        <div class="empty-state">No results yet. Enter match scores in the Matches tab.</div>
+      </div>
+    </div>
+    <div class="reset-row">
+      <button class="btn btn-outline btn-sm" onclick="confirmReset()">Reset Everything</button>
+    </div>
+  </div>
+
+</div><!-- /content -->
+
+<script>
+// ── State ─────────────────────────────────────────────────────────────────────
+const DEADLINE = new Date('2026-04-23T23:59:59');
+const START_DATE = new Date('2026-04-20');
+
+let state = loadState();
+
+function loadState() {
+  // Check URL hash for shared state first
+  try {
+    const hash = window.location.hash;
+    if (hash.startsWith('#share=')) {
+      const decoded = JSON.parse(atob(hash.slice(7)));
+      window.location.hash = '';
+      if (decoded && decoded.players) {
+        localStorage.setItem('tennis_rr', JSON.stringify(decoded));
+        return decoded;
+      }
+    }
+  } catch(e) {}
+  try {
+    const saved = localStorage.getItem('tennis_rr');
+    if (saved) return JSON.parse(saved);
+  } catch(e) {}
+  return { players: [], matches: [], generated: false, defaultLocation: '' };
+}
+
+function saveState() {
+  if (!state.defaultLocation) state.defaultLocation = '';
+  localStorage.setItem('tennis_rr', JSON.stringify(state));
+}
+
+// ── Tabs ──────────────────────────────────────────────────────────────────────
+function switchTab(tab) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  document.querySelectorAll('.tab').forEach(t => {
+    if (t.textContent.toLowerCase().includes(tab)) t.classList.add('active');
+  });
+  if (tab === 'matches') renderMatches();
+  if (tab === 'standings') renderStandings();
+  if (tab === 'players') renderPlayers();
+}
+
+// ── Players ───────────────────────────────────────────────────────────────────
+function addPlayer() {
+  const input = document.getElementById('playerNameInput');
+  const name = input.value.trim();
+  if (!name) return;
+  if (state.players.includes(name)) { alert('Player already exists.'); return; }
+  state.players.push(name);
+  input.value = '';
+  saveState();
+  renderPlayers();
+}
+
+function removePlayer(name) {
+  if (state.generated) {
+    if (!confirm('Removing a player will clear the current schedule and scores. Continue?')) return;
+    state.matches = [];
+    state.generated = false;
+  }
+  state.players = state.players.filter(p => p !== name);
+  saveState();
+  renderPlayers();
+}
+
+const BERKELEY_COURTS = [
+  '',
+  'Willard Park',
+  'Live Oak Park',
+  'Ohlone Park',
+  'Codornices Park',
+  'Bushrod Park',
+  'John Hinkel Park',
+  'Civic Center Park',
+  'Strawberry Canyon (UC Berkeley)',
+  'Clark Kerr Campus (UC Berkeley)',
+  'Berkeley Tennis Club',
+  'King Junior High Courts',
+];
+
+function renderPlayers() {
+  const list = document.getElementById('playerList');
+  const preview = document.getElementById('schedulePreview');
+  const note = document.getElementById('generateNote');
+
+  if (state.players.length === 0) {
+    list.innerHTML = '<span class="note">No players yet.</span>';
+    preview.textContent = '';
+    return;
+  }
+
+  list.innerHTML = state.players.map(p => `
+    <div class="player-chip">
+      <span>${escHtml(p)}</span>
+      <button onclick="removePlayer('${escAttr(p)}')" title="Remove">×</button>
+    </div>
+  `).join('');
+
+  const n = state.players.length;
+  const matchCount = n * (n - 1) / 2;
+  if (n >= 2) {
+    preview.textContent = `${n} players → ${matchCount} matches`;
+    note.textContent = state.generated ? '✓ Schedule generated (regenerating will clear scores)' : '';
+  } else {
+    preview.textContent = 'Need at least 2 players.';
+  }
+}
+
+// ── Schedule Generation ───────────────────────────────────────────────────────
+function generateSchedule() {
+  if (state.players.length < 2) { alert('Add at least 2 players first.'); return; }
+  if (state.generated && !confirm('This will clear all existing scores. Continue?')) return;
+
+  state.matches = [];
+  const list = [...state.players];
+  if (list.length % 2 !== 0) list.push('BYE');
+  const half = list.length / 2;
+  const numRounds = list.length - 1;
+  let id = 1;
+
+  for (let r = 0; r < numRounds; r++) {
+    for (let i = 0; i < half; i++) {
+      const p1 = list[i], p2 = list[list.length - 1 - i];
+      if (p1 !== 'BYE' && p2 !== 'BYE') {
+        state.matches.push({
+          id: id++, round: r + 1, p1, p2,
+          score1: '', score2: '', complete: false,
+          location: ''
+        });
+      }
+    }
+    list.splice(1, 0, list.pop());
+  }
+
+  state.generated = true;
+  saveState();
+  renderPlayers();
+  alert(`Schedule generated! ${state.matches.length} matches across ${numRounds} rounds.`);
+}
+
+// ── Deadline helpers ──────────────────────────────────────────────────────────
+function daysUntilDeadline() {
+  const now = new Date();
+  const diff = DEADLINE - now;
+  return Math.ceil(diff / (1000 * 60 * 60 * 24));
+}
+
+function deadlineBannerHtml() {
+  const days = daysUntilDeadline();
+  if (days < 0) {
+    return `<div class="deadline-banner overdue">⚠ Deadline passed — matches were due by Apr 23, 2026</div>`;
+  } else if (days <= 1) {
+    return `<div class="deadline-banner urgent">🔴 Deadline today! All matches must be played by Apr 23, 2026</div>`;
+  } else if (days <= 3) {
+    return `<div class="deadline-banner urgent">🟠 ${days} day${days===1?'':'s'} left — deadline Apr 23, 2026 · Started Apr 20</div>`;
+  } else {
+    return `<div class="deadline-banner ok">📅 ${days} days until deadline (Apr 23, 2026) · Play window: Apr 20–23</div>`;
+  }
+}
+
+function deadlineTagHtml() {
+  const days = daysUntilDeadline();
+  if (days < 0) return `<span class="deadline-tag late">⚠ Overdue</span>`;
+  if (days <= 1) return `<span class="deadline-tag late">Due today</span>`;
+  if (days <= 3) return `<span class="deadline-tag soon">📅 ${days}d left</span>`;
+  return `<span class="deadline-tag ok">📅 Apr 23</span>`;
+}
+
+// ── Matches ───────────────────────────────────────────────────────────────────
+let activeRoundFilter = 'all';
+let editingLocation = null; // match id being edited
+
+function renderMatches() {
+  const container = document.getElementById('matchesContainer');
+  const filterBar = document.getElementById('roundFilter');
+  const banner = document.getElementById('deadlineBanner');
+
+  banner.innerHTML = state.generated ? deadlineBannerHtml() : '';
+
+  if (!state.generated || state.matches.length === 0) {
+    container.innerHTML = '<div class="empty-state">Generate a schedule first in the Players tab.</div>';
+    filterBar.innerHTML = '';
+    return;
+  }
+
+  const rounds = [...new Set(state.matches.map(m => m.round))].sort((a,b) => a-b);
+
+  filterBar.innerHTML = `
+    <button class="filter-btn ${activeRoundFilter==='all'?'active':''}" onclick="setRoundFilter('all')">All</button>
+    ${rounds.map(r => {
+      const done = state.matches.filter(m => m.round===r && m.complete).length;
+      const total = state.matches.filter(m => m.round===r).length;
+      return `<button class="filter-btn ${activeRoundFilter===r?'active':''}" onclick="setRoundFilter(${r})">Round ${r} <span style="opacity:0.7">${done}/${total}</span></button>`;
+    }).join('')}
+    <button class="filter-btn ${activeRoundFilter==='pending'?'active':''}" onclick="setRoundFilter('pending')">Pending</button>
+  `;
+
+  const visibleRounds = (activeRoundFilter === 'all' || activeRoundFilter === 'pending') ? rounds : [activeRoundFilter];
+
+  let html = '';
+  for (const r of visibleRounds) {
+    let matches = state.matches.filter(m => m.round === r);
+    if (activeRoundFilter === 'pending') matches = matches.filter(m => !m.complete);
+    if (!matches.length) continue;
+
+    const doneCount = state.matches.filter(m => m.round === r && m.complete).length;
+    const totalCount = state.matches.filter(m => m.round === r).length;
+
+    html += `<div class="match-group">
+      <div class="match-group-header">
+        <h3>Round ${r}</h3>
+        <span class="note">${doneCount}/${totalCount} done</span>
+      </div>`;
+
+    for (const m of matches) {
+      const w = m.complete ? winner(m) : null;
+      const isOverdue = !m.complete && daysUntilDeadline() < 0;
+      html += `<div class="match-card ${m.complete?'complete':''} ${isOverdue?'overdue-match':''}">
+        <div class="match-main">
+          <div class="player-name ${m.complete&&w===m.p1?'winner':m.complete?'loser':''}">${escHtml(m.p1)}</div>
+          <span class="vs">vs</span>
+          <div class="player-name ${m.complete&&w===m.p2?'winner':m.complete?'loser':''}">${escHtml(m.p2)}</div>
+          <div class="match-actions">
+            ${m.complete
+              ? `<span class="badge badge-green">✓ ${escHtml(m.score1)}–${escHtml(m.score2)}</span>
+                 <button class="btn btn-outline btn-xs" onclick="editMatch(${m.id})">Edit</button>`
+              : `<div class="score-input-wrap">
+                   <input type="text" id="s1-${m.id}" value="${escAttr(m.score1)}" placeholder="0"
+                     onkeydown="if(event.key==='Enter')saveMatch(${m.id})">
+                   <span class="score-sep">–</span>
+                   <input type="text" id="s2-${m.id}" value="${escAttr(m.score2)}" placeholder="0"
+                     onkeydown="if(event.key==='Enter')saveMatch(${m.id})">
+                 </div>
+                 <button class="btn btn-green btn-xs" onclick="saveMatch(${m.id})">Save</button>`
+            }
+          </div>
+        </div>
+        <div class="match-meta">
+          ${editingLocation === m.id
+            ? `<div class="location-edit">
+                 📍
+                 <select id="loc-${m.id}" onchange="saveLocation(${m.id})" onkeydown="if(event.key==='Escape')cancelLocation()">
+                   ${BERKELEY_COURTS.map(c => `<option value="${escAttr(c)}" ${c===m.location?'selected':''}>${c || '— select court —'}</option>`).join('')}
+                 </select>
+                 <button class="btn btn-outline btn-xs" onclick="cancelLocation()">Cancel</button>
+               </div>`
+            : `<span class="location-display ${!m.location?'empty':''}" onclick="startEditLocation(${m.id})" title="Click to set court">
+                 📍 ${m.location ? escHtml(m.location) : 'Set court'}
+               </span>`
+          }
+          ${!m.complete ? deadlineTagHtml() : ''}
+        </div>
+      </div>`;
+    }
+    html += '</div>';
+  }
+
+  if (!html) html = '<div class="empty-state">No matches to show.</div>';
+  container.innerHTML = html;
+
+  // Focus location input if editing
+  if (editingLocation !== null) {
+    const inp = document.getElementById('loc-' + editingLocation);
+    if (inp) inp.focus();
+  }
+}
+
+function setRoundFilter(val) {
+  activeRoundFilter = val;
+  renderMatches();
+}
+
+function saveMatch(id) {
+  const m = state.matches.find(x => x.id === id);
+  if (!m) return;
+  const s1 = document.getElementById('s1-' + id)?.value.trim();
+  const s2 = document.getElementById('s2-' + id)?.value.trim();
+  if (!s1 || !s2) { alert('Enter scores for both players.'); return; }
+  if (s1 === s2) { alert('Scores cannot be tied — enter different values.'); return; }
+  m.score1 = s1; m.score2 = s2; m.complete = true;
+  saveState();
+  renderMatches();
+}
+
+function editMatch(id) {
+  const m = state.matches.find(x => x.id === id);
+  if (!m) return;
+  m.complete = false;
+  saveState();
+  renderMatches();
+}
+
+// ── Location editing ──────────────────────────────────────────────────────────
+function startEditLocation(id) {
+  editingLocation = id;
+  renderMatches();
+}
+
+function cancelLocation() {
+  editingLocation = null;
+  renderMatches();
+}
+
+function saveLocation(id) {
+  const m = state.matches.find(x => x.id === id);
+  if (!m) return;
+  const sel = document.getElementById('loc-' + id);
+  m.location = sel ? sel.value : '';
+  editingLocation = null;
+  saveState();
+  renderMatches();
+}
+
+// ── Score helpers ─────────────────────────────────────────────────────────────
+function winner(m) {
+  const s1 = parseFloat(m.score1), s2 = parseFloat(m.score2);
+  if (!isNaN(s1) && !isNaN(s2)) return s1 > s2 ? m.p1 : m.p2;
+  return countSets(m.score1, m.score2) >= 0 ? m.p1 : m.p2;
+}
+
+function countSets(s1, s2) {
+  const parts = s1.split(',');
+  if (parts.length > 1) {
+    let w1 = 0, w2 = 0;
+    parts.forEach(p => {
+      const [a, b] = p.trim().split('-').map(Number);
+      if (!isNaN(a) && !isNaN(b)) a > b ? w1++ : w2++;
+    });
+    return w1 - w2;
+  }
+  return 0;
+}
+
+// ── Standings ─────────────────────────────────────────────────────────────────
+function renderStandings() {
+  const container = document.getElementById('standingsTable');
+  const completed = state.matches.filter(m => m.complete);
+
+  if (!state.players.length || !completed.length) {
+    container.innerHTML = '<div class="empty-state">No results yet. Enter match scores in the Matches tab.</div>';
+    return;
+  }
+
+  const stats = {};
+  state.players.forEach(p => { stats[p] = { played:0, wins:0, losses:0, setsW:0, setsL:0 }; });
+
+  completed.forEach(m => {
+    const w = winner(m), l = w === m.p1 ? m.p2 : m.p1;
+    if (!stats[w] || !stats[l]) return;
+    stats[w].played++; stats[w].wins++;
+    stats[l].played++; stats[l].losses++;
+
+    const sets = countSets(m.score1, m.score2);
+    if (sets !== 0) {
+      const p1Sets = m.score1.split(',').filter(p => {
+        const [a,b] = p.trim().split('-').map(Number); return a > b;
+      }).length;
+      const p2Sets = m.score1.split(',').length - p1Sets;
+      stats[m.p1].setsW += p1Sets; stats[m.p1].setsL += p2Sets;
+      stats[m.p2].setsW += p2Sets; stats[m.p2].setsL += p1Sets;
+    } else {
+      stats[w].setsW++; stats[l].setsL++;
+    }
+  });
+
+  const sorted = state.players
+    .map(p => ({ name: p, ...stats[p] }))
+    .sort((a, b) => b.wins - a.wins || (b.setsW - b.setsL) - (a.setsW - a.setsL));
+
+  const total = state.matches.length, done = completed.length;
+  const pct = Math.round(done / total * 100);
+
+  let html = `
+    <div style="margin-bottom:14px; font-size:0.83rem; color:#888;">
+      ${done} of ${total} matches completed
+      <span style="margin-left:8px; background:#e8f5e9; color:#2e7d32; padding:2px 8px; border-radius:10px; font-weight:700;">${pct}%</span>
+    </div>
+    <table><thead><tr>
+      <th>#</th><th>Player</th>
+      <th class="num">W</th><th class="num">L</th>
+      <th class="num">Sets ±</th><th>Win %</th>
+    </tr></thead><tbody>`;
+
+  sorted.forEach((p, i) => {
+    const rank = i + 1;
+    const cls = rank <= 3 ? `rank-${rank}` : 'rank-other';
+    const pct = p.played ? Math.round(p.wins / p.played * 100) : 0;
+    const diff = p.setsW - p.setsL;
+    html += `<tr>
+      <td><span class="rank ${cls}">${rank}</span></td>
+      <td><strong>${escHtml(p.name)}</strong></td>
+      <td class="num" style="color:#0a7a35;font-weight:700">${p.wins}</td>
+      <td class="num" style="color:#aaa">${p.losses}</td>
+      <td class="num" style="color:${diff>0?'#0a7a35':diff<0?'#c62828':'#aaa'};font-weight:600">${diff>0?'+':''}${diff}</td>
+      <td><div class="pct-bar">
+        <div class="pct-track"><div class="pct-fill" style="width:${pct}%"></div></div>
+        <span style="font-size:0.78rem;color:#666;width:34px">${pct}%</span>
+      </div></td>
+    </tr>`;
+  });
+
+  html += '</tbody></table>';
+  container.innerHTML = html;
+}
+
+// ── Share: download read-only player view ─────────────────────────────────────
+function downloadPlayerView() {
+  if (!state.generated) { alert('Generate a schedule first.'); return; }
+
+  const rounds = [...new Set(state.matches.map(m => m.round))].sort((a,b) => a-b);
+  const completed = state.matches.filter(m => m.complete);
+
+  // Build standings
+  const stats = {};
+  state.players.forEach(p => { stats[p] = { played:0, wins:0, losses:0 }; });
+  completed.forEach(m => {
+    const w = winner(m), l = w === m.p1 ? m.p2 : m.p1;
+    if (stats[w]) { stats[w].played++; stats[w].wins++; }
+    if (stats[l]) { stats[l].played++; stats[l].losses++; }
+  });
+  const sorted = state.players
+    .map(p => ({ name: p, ...stats[p] }))
+    .sort((a,b) => b.wins - a.wins);
+
+  const standingsRows = sorted.map((p, i) => {
+    const medals = ['🥇','🥈','🥉'];
+    const icon = i < 3 ? medals[i] : `${i+1}.`;
+    const pct = p.played ? Math.round(p.wins/p.played*100) : 0;
+    return `<tr>
+      <td>${icon}</td>
+      <td><strong>${esc(p.name)}</strong></td>
+      <td>${p.wins}</td><td>${p.losses}</td><td>${pct}%</td>
+    </tr>`;
+  }).join('');
+
+  // Build schedule
+  const scheduleHtml = rounds.map(r => {
+    const matches = state.matches.filter(m => m.round === r);
+    const rows = matches.map(m => {
+      const w = m.complete ? winner(m) : null;
+      const score = m.complete ? `<span class="score">${esc(m.score1)}–${esc(m.score2)}</span>` : '<span class="pending">Pending</span>';
+      const loc = m.location ? `<span class="loc">📍 ${esc(m.location)}</span>` : '';
+      return `<tr class="${m.complete?'done':''}">
+        <td class="${m.complete&&w===m.p1?'win':''}">${esc(m.p1)}</td>
+        <td class="vs">vs</td>
+        <td class="${m.complete&&w===m.p2?'win':''}">${esc(m.p2)}</td>
+        <td>${score}</td>
+        <td>${loc}</td>
+      </tr>`;
+    }).join('');
+    const doneCount = matches.filter(m=>m.complete).length;
+    return `<h3>Round ${r} <small>${doneCount}/${matches.length}</small></h3>
+      <table><thead><tr><th>Player</th><th></th><th>Player</th><th>Score</th><th>Location</th></tr></thead>
+      <tbody>${rows}</tbody></table>`;
+  }).join('');
+
+  const done = completed.length, total = state.matches.length;
+  const generated = new Date().toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
+
+  const html = `<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tennis Round Robin</title>
+<style>
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; background:#f5f5f5; color:#1a1a1a; }
+  header { background:#0a3a1f; color:white; padding:18px 24px; }
+  header h1 { font-size:1.3rem; }
+  header p { font-size:0.82rem; opacity:0.7; margin-top:4px; }
+  .content { max-width:720px; margin:24px auto; padding:0 16px; }
+  .section { background:white; border-radius:10px; padding:20px; margin-bottom:20px; box-shadow:0 1px 6px rgba(0,0,0,0.08); }
+  h2 { font-size:0.75rem; text-transform:uppercase; letter-spacing:0.5px; color:#888; margin-bottom:14px; font-weight:700; }
+  h3 { font-size:0.88rem; font-weight:700; color:#333; margin:18px 0 8px; }
+  h3:first-child { margin-top:0; }
+  h3 small { font-weight:400; color:#aaa; margin-left:6px; }
+  table { width:100%; border-collapse:collapse; font-size:0.87rem; margin-bottom:4px; }
+  th { text-align:left; padding:7px 10px; background:#f5f5f5; color:#666; font-size:0.75rem; text-transform:uppercase; border-bottom:2px solid #eee; }
+  td { padding:10px; border-bottom:1px solid #f0f0f0; }
+  tr:last-child td { border-bottom:none; }
+  td.win { font-weight:700; color:#0a7a35; }
+  td.vs { color:#ccc; font-size:0.75rem; text-align:center; width:28px; }
+  .score { font-weight:700; color:#0a7a35; }
+  .pending { color:#bbb; font-style:italic; }
+  .loc { color:#888; font-size:0.8rem; }
+  tr.done td { background:#fafffe; }
+  .deadline { background:#fff3e0; border:1.5px solid #ffcc80; border-radius:8px; padding:10px 14px; font-size:0.85rem; color:#e65100; font-weight:600; margin-bottom:16px; }
+  .progress { font-size:0.82rem; color:#888; margin-bottom:14px; }
+  .badge { display:inline-block; background:#e8f5e9; color:#2e7d32; padding:2px 8px; border-radius:10px; font-weight:700; font-size:0.75rem; }
+</style>
+</head><body>
+<header>
+  <h1>🎾 Tennis Round Robin</h1>
+  <p>Updated ${generated} · Read-only view</p>
+</header>
+<div class="content">
+  <div class="deadline">📅 Play window: Apr 20–23, 2026 · Deadline: April 23</div>
+  <div class="section">
+    <h2>Standings</h2>
+    <div class="progress">${done} of ${total} matches completed <span class="badge">${Math.round(done/total*100)}%</span></div>
+    <table>
+      <thead><tr><th>#</th><th>Player</th><th>W</th><th>L</th><th>Win%</th></tr></thead>
+      <tbody>${standingsRows}</tbody>
+    </table>
+  </div>
+  <div class="section">
+    <h2>Schedule</h2>
+    ${scheduleHtml}
+  </div>
+</div>
+</body></html>`;
+
+  const blob = new Blob([html], { type: 'text/html' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'tennis_round_robin_view.html';
+  a.click();
+  URL.revokeObjectURL(a.href);
+
+  function esc(s) {
+    return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+}
+
+// ── Reset ─────────────────────────────────────────────────────────────────────
+function confirmReset() {
+  if (confirm('Reset everything? This will delete all players, matches, and scores.')) {
+    state = { players: [], matches: [], generated: false, defaultLocation: '' };
+    saveState();
+    activeRoundFilter = 'all';
+    editingLocation = null;
+    switchTab('players');
+  }
+}
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function escAttr(s) {
+  return String(s).replace(/'/g,"\\'").replace(/"/g,'&quot;');
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+renderPlayers();
+if (state.generated) document.getElementById('generateNote').textContent = '✓ Schedule generated';
+</script>
+</body>
+</html>
