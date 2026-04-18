@@ -417,6 +417,25 @@ button.btn {
 .pill-green { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; }
 .pill-gray  { background: #f3f4f6; color: #9ca3af; }
 
+/* Invitation / confirmation */
+.invite-row {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  margin-top: 8px; padding-top: 8px; border-top: 1px dashed #e5e7eb;
+}
+.invite-msg { font-size: 0.72rem; color: #6b7280; flex: 1; min-width: 140px; }
+.invite-msg.pending { color: #92400e; }
+.invite-msg.missing { color: #9ca3af; }
+.confirmed-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0;
+  border-radius: 20px; padding: 3px 10px;
+  font-size: 0.72rem; font-weight: 700;
+}
+.btn-accept {
+  background: #d97706; color: white;
+}
+.btn-accept:hover { background: #b45309; }
+
 /* ── Responsive ── */
 @media(max-width:560px){
   .match-teams { grid-template-columns: 1fr 1fr; }
@@ -489,7 +508,15 @@ button.btn {
 
 <script>
 // ── Constants ─────────────────────────────────────────────────────────────────
-const DEADLINE = new Date('2026-04-25T23:59:59');
+const TOURNEY_START    = new Date('2026-04-20T00:00:00');
+const GROUP_DEADLINE   = new Date('2026-04-30T23:59:59');
+const FINALS_DEADLINE  = new Date('2026-05-08T23:59:59');
+
+// Date ranges for match scheduling inputs
+const GROUP_MIN_DATE   = '2026-04-20';
+const GROUP_MAX_DATE   = '2026-04-30';
+const FINALS_MIN_DATE  = '2026-05-04';
+const FINALS_MAX_DATE  = '2026-05-08';
 
 const BERKELEY_COURTS = [
   '',
@@ -600,7 +627,7 @@ function generateSchedule() {
           id: matchId++,
           t1: teamSlice[i].id, t2: teamSlice[j].id,
           score1: '', score2: '', complete: false,
-          date: '', time: '', location: ''
+          date: '', time: '', location: '', confirmed: false
         });
       }
     }
@@ -610,11 +637,11 @@ function generateSchedule() {
   // Initialize knockouts
   state.semis = [
     { id:'SF1', label:'Semi-Final 1', seed1:'A1', seed2:'B2',
-      t1:null, t2:null, score1:'', score2:'', complete:false, date:'', location:'' },
+      t1:null, t2:null, score1:'', score2:'', complete:false, date:'', time:'', location:'', confirmed:false },
     { id:'SF2', label:'Semi-Final 2', seed1:'B1', seed2:'A2',
-      t1:null, t2:null, score1:'', score2:'', complete:false, date:'', location:'' },
+      t1:null, t2:null, score1:'', score2:'', complete:false, date:'', time:'', location:'', confirmed:false },
   ];
-  state.final = { id:'F', label:'Final', t1:null, t2:null, score1:'', score2:'', complete:false, date:'', location:'' };
+  state.final = { id:'F', label:'Final', t1:null, t2:null, score1:'', score2:'', complete:false, date:'', time:'', location:'', confirmed:false };
   state.generated = true;
   saveState(); renderTeams();
   alert(`Schedule generated! Groups: ${GROUP_LABELS.slice(0,numGroups).join(', ')}`);
@@ -700,23 +727,31 @@ function teamName(id) {
 }
 
 // ── Deadline ──────────────────────────────────────────────────────────────────
-function daysLeft() {
-  return Math.ceil((DEADLINE - new Date()) / 86400000);
+function daysLeft(deadline) {
+  return Math.ceil((deadline - new Date()) / 86400000);
 }
-function deadlineBannerHtml() {
-  const d = daysLeft();
-  if (d < 0)  return `<div class="deadline-banner overdue">⚠ Deadline passed — matches were due by Apr 25, 2026</div>`;
-  if (d === 0) return `<div class="deadline-banner urgent">🔴 Last day! All matches due by Apr 25, 2026</div>`;
-  if (d <= 2)  return `<div class="deadline-banner urgent">🟠 ${d} day${d===1?'':'s'} left — deadline Apr 25</div>`;
-  if (d <= 4)  return `<div class="deadline-banner soon">📅 ${d} days left · Play window Apr 23–25, 2026</div>`;
-  return              `<div class="deadline-banner ok">📅 ${d} days until deadline (Apr 25, 2026) · Play window Apr 23–25</div>`;
+function deadlineBannerHtml(stage) {
+  // stage: 'groups' or 'bracket'
+  const isGroups = stage === 'groups';
+  const deadline = isGroups ? GROUP_DEADLINE : FINALS_DEADLINE;
+  const dateLabel = isGroups ? 'Apr 30, 2026' : 'May 8, 2026';
+  const windowLabel = isGroups ? 'Play window Apr 20–30, 2026' : 'Play window May 4–8, 2026';
+  const d = daysLeft(deadline);
+  if (d < 0)   return `<div class="deadline-banner overdue">⚠ Deadline passed — ${isGroups?'group':'knockout'} matches were due by ${dateLabel}</div>`;
+  if (d === 0) return `<div class="deadline-banner urgent">🔴 Last day! All ${isGroups?'group':'knockout'} matches due by ${dateLabel}</div>`;
+  if (d <= 2)  return `<div class="deadline-banner urgent">🟠 ${d} day${d===1?'':'s'} left — deadline ${dateLabel}</div>`;
+  if (d <= 5)  return `<div class="deadline-banner soon">📅 ${d} days left · ${windowLabel}</div>`;
+  return              `<div class="deadline-banner ok">📅 ${d} days until deadline (${dateLabel}) · ${windowLabel}</div>`;
 }
-function deadlineTag() {
-  const d = daysLeft();
+function deadlineTag(stage) {
+  const isGroups = stage === 'groups';
+  const deadline = isGroups ? GROUP_DEADLINE : FINALS_DEADLINE;
+  const dateLabel = isGroups ? 'Apr 30' : 'May 8';
+  const d = daysLeft(deadline);
   if (d < 0)  return `<span class="deadline-tag late">⚠ Overdue</span>`;
   if (d <= 1) return `<span class="deadline-tag late">Due today</span>`;
   if (d <= 3) return `<span class="deadline-tag soon">⏰ ${d}d left</span>`;
-  return              `<span class="deadline-tag ok">Apr 25</span>`;
+  return              `<span class="deadline-tag ok">${dateLabel}</span>`;
 }
 
 // ── Court options HTML ────────────────────────────────────────────────────────
@@ -731,7 +766,7 @@ function renderGroups() {
   const container = document.getElementById('groupsContainer');
   const banner    = document.getElementById('groupsDeadlineBanner');
 
-  banner.innerHTML = state.generated ? deadlineBannerHtml() : '';
+  banner.innerHTML = state.generated ? deadlineBannerHtml('groups') : '';
 
   if (!state.generated) {
     container.innerHTML = '<div class="empty-state">Generate a schedule first in the Teams tab.</div>';
@@ -771,7 +806,6 @@ function renderGroups() {
           <div class="team-nm ${m.complete?(w===m.t2?'winner':'loser'):''}">${escHtml(teamName(m.t2))}</div>
         </div>
         <div class="match-section pregame">
-          <div class="section-label">Before Game</div>
           <div class="meta-row">
             <div class="meta-item">
               <span>📍</span>
@@ -782,7 +816,7 @@ function renderGroups() {
             <div class="meta-item">
               <span>📅</span>
               <input type="date" class="${m.date?'':'unset'}" value="${escA(m.date||'')}"
-                min="2026-04-23" max="2026-04-25"
+                min="${GROUP_MIN_DATE}" max="${GROUP_MAX_DATE}"
                 onchange="saveGroupField('${g.label}',${m.id},'date',this.value)">
             </div>
             <div class="meta-item">
@@ -790,8 +824,9 @@ function renderGroups() {
               <input type="time" class="${m.time?'':'unset'}" value="${escA(m.time||'')}"
                 onchange="saveGroupField('${g.label}',${m.id},'time',this.value)">
             </div>
-            ${!m.complete ? deadlineTag() : ''}
+            ${!m.complete ? deadlineTag('groups') : ''}
           </div>
+          ${inviteRowHtml(m, 'group', g.label)}
         </div>
         <div class="match-section score-section">
           <div class="section-label">Score</div>
@@ -855,7 +890,24 @@ function editGroupMatch(groupLabel, matchId) {
 function saveGroupField(groupLabel, matchId, field, value) {
   const g = state.groups.find(g => g.label === groupLabel);
   const m = g?.matches.find(m => m.id === matchId);
-  if (m) { m[field] = value; saveState(); }
+  if (!m) return;
+  m[field] = value;
+  if (field === 'location' || field === 'date' || field === 'time') {
+    m.confirmed = false;
+  }
+  saveState(); renderGroups();
+}
+
+function confirmGroupMatch(groupLabel, matchId) {
+  const g = state.groups.find(g => g.label === groupLabel);
+  const m = g?.matches.find(m => m.id === matchId);
+  if (!m) return;
+  if (!m.location || !m.date || !m.time) {
+    alert('Location, date, and time must all be set before accepting.');
+    return;
+  }
+  m.confirmed = true;
+  saveState(); renderGroups();
 }
 
 function clearKnockoutFromGroup(groupLabel) {
@@ -874,7 +926,7 @@ function renderBracket() {
   const container = document.getElementById('bracketContainer');
   const banner    = document.getElementById('bracketDeadlineBanner');
 
-  banner.innerHTML = state.generated ? deadlineBannerHtml() : '';
+  banner.innerHTML = state.generated ? deadlineBannerHtml('bracket') : '';
 
   if (!state.generated) {
     container.innerHTML = '<div class="empty-state">Generate a schedule first in the Teams tab.</div>';
@@ -932,18 +984,18 @@ function renderBracket() {
         ${t2score}
       </div>
       <div class="b-match-footer" style="background:#f9fafb;border-top:1px solid #f3f4f6">
-        <div style="font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:#9ca3af;margin-bottom:6px">Before Game</div>
         <div class="b-meta">
           <select class="${m.location?'':'unset'}" onchange="saveKnockoutField('${m.id}','location',this.value)">
             ${courtOptions(m.location||'')}
           </select>
           <input type="date" class="${m.date?'':'unset'}" value="${escA(m.date||'')}"
-            min="2026-04-23" max="2026-04-25"
+            min="${FINALS_MIN_DATE}" max="${FINALS_MAX_DATE}"
             onchange="saveKnockoutField('${m.id}','date',this.value)">
           <input type="time" class="${m.time?'':'unset'}" value="${escA(m.time||'')}"
             onchange="saveKnockoutField('${m.id}','time',this.value)"
             style="width:82px">
         </div>
+        ${inviteRowHtml(m, 'knockout')}
       </div>
       <div class="b-match-footer" style="border-top:1px solid #f3f4f6">
         <div style="font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:#9ca3af;margin-bottom:6px">Score</div>
@@ -1035,7 +1087,55 @@ function editKnockout(id) {
 
 function saveKnockoutField(id, field, value) {
   const m = findKnockout(id);
-  if (m) { m[field] = value; saveState(); }
+  if (!m) return;
+  m[field] = value;
+  if (field === 'location' || field === 'date' || field === 'time') {
+    m.confirmed = false;
+  }
+  saveState(); renderBracket();
+}
+
+function confirmKnockoutMatch(id) {
+  const m = findKnockout(id);
+  if (!m) return;
+  if (!m.location || !m.date || !m.time) {
+    alert('Location, date, and time must all be set before accepting.');
+    return;
+  }
+  m.confirmed = true;
+  saveState(); renderBracket();
+}
+
+// ── Invitation row ────────────────────────────────────────────────────────────
+function inviteRowHtml(m, kind, groupLabel) {
+  // For knockout matches, only show invite when both teams are known
+  if (kind === 'knockout' && (!m.t1 || !m.t2)) return '';
+  // Once the match is complete, don't bother showing the invite row
+  if (m.complete) return '';
+
+  const hasAll = !!(m.location && m.date && m.time);
+
+  if (m.confirmed && hasAll) {
+    return `<div class="invite-row">
+      <span class="confirmed-badge">✓ Confirmed by both teams</span>
+    </div>`;
+  }
+  if (hasAll) {
+    const onclick = kind === 'group'
+      ? `confirmGroupMatch('${groupLabel}',${m.id})`
+      : `confirmKnockoutMatch('${m.id}')`;
+    return `<div class="invite-row">
+      <span class="invite-msg pending">Proposed — opponent must accept</span>
+      <button class="btn btn-accept btn-xs" onclick="${onclick}">Accept Invitation</button>
+    </div>`;
+  }
+  const missing = [];
+  if (!m.location) missing.push('location');
+  if (!m.date)     missing.push('date');
+  if (!m.time)     missing.push('time');
+  return `<div class="invite-row">
+    <span class="invite-msg missing">Set ${missing.join(', ')} to send invitation</span>
+  </div>`;
 }
 
 function findKnockout(id) {
