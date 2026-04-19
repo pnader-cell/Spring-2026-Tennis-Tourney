@@ -646,12 +646,8 @@ document.getElementById('googleSigninBtn').addEventListener('click', async () =>
   }
 
   try {
-    // Mobile browsers handle redirect better than popup; desktop uses popup
-    if (isMobile()) {
-      await signInWithRedirect(auth, provider);
-    } else {
-      await signInWithPopup(auth, provider);
-    }
+    // Popup first on all normal browsers; redirect only if popup fails
+    await signInWithPopup(auth, provider);
   } catch (e) {
     console.error(e);
     // Common popup failures → fall back to redirect
