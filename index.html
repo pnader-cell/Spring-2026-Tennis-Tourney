@@ -534,7 +534,15 @@ button.btn:disabled { opacity: 0.45; cursor: not-allowed; }
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import {
-  getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged
+  getAuth,
+  GoogleAuthProvider,
+  signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
+  signOut,
+  onAuthStateChanged,
+  browserLocalPersistence,
+  setPersistence
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import {
   getFirestore, doc, onSnapshot, setDoc, getDoc, serverTimestamp
@@ -554,6 +562,7 @@ const ADMIN_EMAIL = "patriciaanader@gmail.com";
 
 const fbApp = initializeApp(firebaseConfig);
 const auth = getAuth(fbApp);
+await setPersistence(auth, browserLocalPersistence);
 const db = getFirestore(fbApp);
 const tournamentRef = doc(db, "tournaments", "main");
 
