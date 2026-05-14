@@ -1,0 +1,1371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jivamaitridham — 5-Year Financial Model</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --navy: #1B2B4D;
+  --navy-light: #243660;
+  --gold: #C8962E;
+  --gold-light: #F5E6C8;
+  --green: #2D7A4F;
+  --green-light: #E6F4ED;
+  --red: #B03A2E;
+  --red-light: #FDECEA;
+  --gray-50: #F8F9FA;
+  --gray-100: #F1F3F5;
+  --gray-200: #E9ECEF;
+  --gray-300: #DEE2E6;
+  --gray-400: #ADB5BD;
+  --gray-600: #6C757D;
+  --gray-700: #495057;
+  --gray-900: #212529;
+  --white: #FFFFFF;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+  --shadow: 0 4px 12px rgba(0,0,0,0.08);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,0.10);
+  --radius: 8px;
+  --radius-sm: 4px;
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-size: 14px;
+  color: var(--gray-900);
+  background: var(--gray-50);
+  min-height: 100vh;
+}
+
+/* HEADER */
+.header {
+  background: var(--navy);
+  color: var(--white);
+  padding: 20px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.header-left { display: flex; align-items: center; gap: 20px; }
+.header-logo {
+  width: 40px; height: 40px;
+  background: var(--gold);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; font-weight: 700; color: var(--white);
+  flex-shrink: 0;
+}
+.header-title { font-size: 18px; font-weight: 700; letter-spacing: -0.3px; }
+.header-subtitle { font-size: 12px; color: rgba(255,255,255,0.6); margin-top: 2px; }
+.header-right { text-align: right; }
+.header-tag {
+  display: inline-block;
+  background: rgba(255,255,255,0.12);
+  color: rgba(255,255,255,0.8);
+  font-size: 11px;
+  font-weight: 500;
+  padding: 4px 10px;
+  border-radius: 20px;
+  letter-spacing: 0.3px;
+}
+.header-date { font-size: 11px; color: rgba(255,255,255,0.45); margin-top: 6px; }
+
+/* MAIN LAYOUT */
+.main { display: flex; gap: 0; min-height: calc(100vh - 82px); }
+
+/* SIDEBAR */
+.sidebar {
+  width: 320px;
+  flex-shrink: 0;
+  background: var(--white);
+  border-right: 1px solid var(--gray-200);
+  overflow-y: auto;
+  position: sticky;
+  top: 0;
+  max-height: calc(100vh - 82px);
+}
+.sidebar-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--gray-200);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.sidebar-title { font-size: 13px; font-weight: 600; color: var(--gray-700); text-transform: uppercase; letter-spacing: 0.6px; }
+.reset-btn {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--gold);
+  background: none;
+  border: 1px solid var(--gold);
+  border-radius: 4px;
+  padding: 4px 10px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.reset-btn:hover { background: var(--gold); color: var(--white); }
+
+/* ACCORDION */
+.accordion-section { border-bottom: 1px solid var(--gray-200); }
+.accordion-btn {
+  width: 100%;
+  padding: 13px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--gray-900);
+  text-align: left;
+  transition: background 0.1s;
+}
+.accordion-btn:hover { background: var(--gray-50); }
+.accordion-btn.open { color: var(--navy); }
+.accordion-icon { font-size: 10px; color: var(--gray-400); transition: transform 0.2s; }
+.accordion-btn.open .accordion-icon { transform: rotate(180deg); }
+.accordion-body {
+  padding: 4px 20px 16px;
+  display: none;
+}
+.accordion-btn.open + .accordion-body { display: block; }
+
+/* CONTROLS */
+.control-group { margin-bottom: 14px; }
+.control-group:last-child { margin-bottom: 0; }
+.control-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--gray-700);
+  margin-bottom: 6px;
+  display: flex;
+  justify-content: space-between;
+}
+.control-value {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--navy);
+  min-width: 50px;
+  text-align: right;
+}
+input[type="range"] {
+  width: 100%;
+  height: 4px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: var(--gray-200);
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: var(--navy);
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+input[type="range"]::-moz-range-thumb {
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: var(--navy);
+  border: none;
+  cursor: pointer;
+}
+.control-input {
+  width: 100%;
+  padding: 7px 10px;
+  border: 1px solid var(--gray-300);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-family: inherit;
+  color: var(--gray-900);
+  outline: none;
+  transition: border-color 0.15s;
+  background: var(--white);
+}
+.control-input:focus { border-color: var(--navy); }
+.control-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.control-sub { font-size: 11px; color: var(--gray-400); margin-top: 2px; }
+
+/* CONTENT */
+.content { flex: 1; overflow-x: hidden; padding: 24px; }
+
+/* KPI CARDS */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 14px;
+  margin-bottom: 24px;
+}
+.kpi-card {
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 16px;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--gray-200);
+  position: relative;
+  overflow: hidden;
+}
+.kpi-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: var(--navy);
+}
+.kpi-card.gold::before { background: var(--gold); }
+.kpi-card.green::before { background: var(--green); }
+.kpi-label { font-size: 11px; font-weight: 600; color: var(--gray-600); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+.kpi-value { font-size: 22px; font-weight: 700; color: var(--gray-900); letter-spacing: -0.5px; }
+.kpi-unit { font-size: 12px; font-weight: 400; color: var(--gray-600); }
+.kpi-sub { font-size: 11px; color: var(--gray-400); margin-top: 4px; }
+
+/* CHARTS */
+.charts-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 14px;
+  margin-bottom: 24px;
+}
+.chart-card {
+  background: var(--white);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--gray-200);
+  padding: 20px;
+}
+.chart-title { font-size: 13px; font-weight: 600; color: var(--gray-900); margin-bottom: 4px; }
+.chart-subtitle { font-size: 11px; color: var(--gray-400); margin-bottom: 16px; }
+.chart-wrap { position: relative; height: 240px; }
+
+/* P&L TABLE */
+.table-card {
+  background: var(--white);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--gray-200);
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+.table-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--gray-200);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.table-title { font-size: 13px; font-weight: 600; color: var(--gray-900); }
+.table-note { font-size: 11px; color: var(--gray-400); }
+.pnl-table { width: 100%; border-collapse: collapse; }
+.pnl-table th {
+  padding: 10px 16px;
+  text-align: right;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--white);
+  background: var(--navy);
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+}
+.pnl-table th:first-child { text-align: left; width: 240px; }
+.pnl-table td {
+  padding: 8px 16px;
+  text-align: right;
+  font-size: 13px;
+  color: var(--gray-700);
+  border-bottom: 1px solid var(--gray-100);
+}
+.pnl-table td:first-child { text-align: left; color: var(--gray-900); }
+.pnl-table tr:hover td { background: var(--gray-50); }
+.row-section td {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--gray-400);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  padding-top: 14px;
+  padding-bottom: 4px;
+  border-bottom: none;
+  background: none !important;
+}
+.row-indent td:first-child { padding-left: 28px; color: var(--gray-600); }
+.row-subtotal td {
+  font-weight: 600;
+  color: var(--gray-900);
+  background: var(--gray-50) !important;
+  border-top: 1px solid var(--gray-300);
+}
+.row-total td {
+  font-weight: 700;
+  color: var(--white) !important;
+  background: var(--navy) !important;
+  font-size: 13px;
+}
+.row-noi td {
+  font-weight: 700;
+  color: var(--green) !important;
+  background: var(--green-light) !important;
+}
+.row-margin td {
+  font-weight: 600;
+  color: var(--gray-600) !important;
+  font-size: 12px;
+  background: #F0F9F4 !important;
+}
+.row-visitors td { color: var(--navy); font-weight: 600; background: var(--gray-50) !important; }
+
+/* VISITOR TABLE */
+.visitor-card {
+  background: var(--white);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--gray-200);
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+.visitor-table { width: 100%; border-collapse: collapse; }
+.visitor-table th {
+  padding: 10px 16px;
+  text-align: right;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--white);
+  background: var(--navy-light);
+  letter-spacing: 0.3px;
+}
+.visitor-table th:first-child { text-align: left; }
+.visitor-table td {
+  padding: 8px 16px;
+  text-align: right;
+  font-size: 13px;
+  color: var(--gray-700);
+  border-bottom: 1px solid var(--gray-100);
+}
+.visitor-table td:first-child { text-align: left; padding-left: 28px; color: var(--gray-600); }
+.visitor-table .row-total-v td {
+  font-weight: 700; color: var(--navy); background: var(--gray-50) !important;
+  border-top: 1px solid var(--gray-300);
+}
+.visitor-table .row-total-v td:first-child { padding-left: 16px; }
+
+/* SENSITIVITY */
+.sens-card {
+  background: var(--white);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--gray-200);
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+.sens-table { width: 100%; border-collapse: collapse; }
+.sens-table th {
+  padding: 8px 12px;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--white);
+  background: var(--navy);
+  letter-spacing: 0.3px;
+}
+.sens-table th:first-child { text-align: left; width: 130px; }
+.sens-table td {
+  padding: 7px 12px;
+  text-align: center;
+  font-size: 12px;
+  border-bottom: 1px solid var(--gray-100);
+}
+.sens-table td:first-child { text-align: left; font-weight: 600; color: var(--gray-700); }
+.sens-base { background: var(--gold-light) !important; font-weight: 600; }
+.sens-high { color: var(--green); }
+.sens-low { color: var(--red); }
+
+/* FOOTER */
+.footer {
+  text-align: center;
+  padding: 20px;
+  font-size: 11px;
+  color: var(--gray-400);
+  border-top: 1px solid var(--gray-200);
+  background: var(--white);
+}
+
+/* SCROLLBAR */
+.sidebar::-webkit-scrollbar { width: 4px; }
+.sidebar::-webkit-scrollbar-track { background: transparent; }
+.sidebar::-webkit-scrollbar-thumb { background: var(--gray-300); border-radius: 2px; }
+
+/* RESPONSIVE */
+@media (max-width: 1200px) {
+  .kpi-grid { grid-template-columns: repeat(3, 1fr); }
+  .charts-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 900px) {
+  .main { flex-direction: column; }
+  .sidebar { width: 100%; max-height: none; position: static; }
+  .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+  .content { padding: 16px; }
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-left">
+    <div class="header-logo">J</div>
+    <div>
+      <div class="header-title">Jivamaitridham (JMD) — Interactive Financial Model</div>
+      <div class="header-subtitle">SRLC | 5-Year Projections: FY2027 – FY2031 · ₹ in Lakhs</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="header-tag">IBD Confidential Draft</div>
+    <div class="header-date">Adjust assumptions in the panel to model scenarios</div>
+  </div>
+</div>
+
+<div class="main">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <span class="sidebar-title">Assumptions</span>
+      <button class="reset-btn" onclick="resetDefaults()">Reset</button>
+    </div>
+
+    <!-- VISITOR GROWTH -->
+    <div class="accordion-section">
+      <button class="accordion-btn open" onclick="toggleAccordion(this)">
+        Visitor Growth <span class="accordion-icon">▼</span>
+      </button>
+      <div class="accordion-body">
+        <div class="control-group">
+          <div class="control-label">Individual Visitor Growth <span class="control-value" id="lbl-indivGrowth">2.0%</span></div>
+          <input type="range" id="indivGrowth" min="0" max="15" step="0.5" value="2" oninput="syncSlider(this,'%')">
+          <div class="control-sub">2025 base: 751,318 individual visitors</div>
+        </div>
+        <div class="control-group">
+          <div class="control-label">School Visitor Growth <span class="control-value" id="lbl-schoolGrowth">10.0%</span></div>
+          <input type="range" id="schoolGrowth" min="0" max="25" step="0.5" value="10" oninput="syncSlider(this,'%')">
+        </div>
+        <div class="control-group">
+          <div class="control-label">Corporate Visitor Growth <span class="control-value" id="lbl-corpGrowth">10.0%</span></div>
+          <input type="range" id="corpGrowth" min="0" max="25" step="0.5" value="10" oninput="syncSlider(this,'%')">
+        </div>
+        <div class="control-group">
+          <div class="control-label">Individual Basic Mix <span class="control-value" id="lbl-indivBasicPct">90%</span></div>
+          <input type="range" id="indivBasicPct" min="50" max="100" step="5" value="90" oninput="syncSlider(this,'%')">
+        </div>
+      </div>
+    </div>
+
+    <!-- PACKAGE PRICING -->
+    <div class="accordion-section">
+      <button class="accordion-btn" onclick="toggleAccordion(this)">
+        Package Pricing <span class="accordion-icon">▼</span>
+      </button>
+      <div class="accordion-body">
+        <div class="control-sub" style="margin-bottom:10px;">Individual Packages</div>
+        <div class="control-row">
+          <div class="control-group">
+            <div class="control-label">Basic Fee</div>
+            <input type="number" class="control-input" id="indivBasicFee" value="128" min="20" max="500" oninput="updateModel()">
+            <div class="control-sub">₹/person</div>
+          </div>
+          <div class="control-group">
+            <div class="control-label">Premium Fee</div>
+            <input type="number" class="control-input" id="indivPremiumFee" value="496" min="100" max="2000" oninput="updateModel()">
+            <div class="control-sub">₹/person</div>
+          </div>
+        </div>
+        <div class="control-sub" style="margin-bottom:10px;margin-top:8px;">School Group Packages</div>
+        <div class="control-row">
+          <div class="control-group">
+            <div class="control-label">Basic Fee</div>
+            <input type="number" class="control-input" id="schoolBasicFee" value="96" min="20" max="500" oninput="updateModel()">
+            <div class="control-sub">₹/person</div>
+          </div>
+          <div class="control-group">
+            <div class="control-label">Premium Fee</div>
+            <input type="number" class="control-input" id="schoolPremiumFee" value="1572" min="100" max="5000" oninput="updateModel()">
+            <div class="control-sub">₹/person</div>
+          </div>
+        </div>
+        <div class="control-sub" style="margin-bottom:10px;margin-top:8px;">Corporate Packages (90% Basic)</div>
+        <div class="control-row">
+          <div class="control-group">
+            <div class="control-label">Basic Fee</div>
+            <input type="number" class="control-input" id="corpBasicFee" value="1512" min="100" max="5000" oninput="updateModel()">
+            <div class="control-sub">₹/person</div>
+          </div>
+          <div class="control-group">
+            <div class="control-label">Premium Fee</div>
+            <input type="number" class="control-input" id="corpPremiumFee" value="3584" min="500" max="10000" oninput="updateModel()">
+            <div class="control-sub">₹/person</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ADD-ON EXPERIENCES -->
+    <div class="accordion-section">
+      <button class="accordion-btn" onclick="toggleAccordion(this)">
+        Add-On Experiences <span class="accordion-icon">▼</span>
+      </button>
+      <div class="accordion-body">
+        <div class="control-sub" style="margin-bottom:10px;">Uptake rates apply to individual visitors</div>
+        <div class="control-group">
+          <div class="control-label">Shelter Guided Tour (₹100) <span class="control-value" id="lbl-tourUptake">23.0%</span></div>
+          <input type="range" id="tourUptake" min="0" max="60" step="1" value="23" oninput="syncSlider(this,'%')">
+        </div>
+        <div class="control-group">
+          <div class="control-label">Petting Area (₹50) <span class="control-value" id="lbl-pettingUptake">18.4%</span></div>
+          <input type="range" id="pettingUptake" min="0" max="60" step="0.5" value="18.4" oninput="syncSlider(this,'%')">
+        </div>
+        <div class="control-group">
+          <div class="control-label">Aviary Center (₹50) <span class="control-value" id="lbl-aviaryUptake">13.8%</span></div>
+          <input type="range" id="aviaryUptake" min="0" max="60" step="0.5" value="13.8" oninput="syncSlider(this,'%')">
+        </div>
+        <div class="control-group">
+          <div class="control-label">Lake Boat Ride (₹20) <span class="control-value" id="lbl-boatUptake">27.6%</span></div>
+          <input type="range" id="boatUptake" min="0" max="60" step="0.5" value="27.6" oninput="syncSlider(this,'%')">
+        </div>
+      </div>
+    </div>
+
+    <!-- OTHER INCOME -->
+    <div class="accordion-section">
+      <button class="accordion-btn" onclick="toggleAccordion(this)">
+        Other Income & Growth <span class="accordion-icon">▼</span>
+      </button>
+      <div class="accordion-body">
+        <div class="control-sub" style="margin-bottom:10px;">Per-visitor rates (all visitors)</div>
+        <div class="control-row">
+          <div class="control-group">
+            <div class="control-label">F&B</div>
+            <input type="number" class="control-input" id="fbRate" value="80" min="0" max="500" oninput="updateModel()">
+            <div class="control-sub">₹/visitor</div>
+          </div>
+          <div class="control-group">
+            <div class="control-label">Retail</div>
+            <input type="number" class="control-input" id="retailRate" value="20" min="0" max="200" oninput="updateModel()">
+            <div class="control-sub">₹/visitor</div>
+          </div>
+        </div>
+        <div class="control-group" style="margin-top:8px;">
+          <div class="control-label">Donation / CSR</div>
+          <input type="number" class="control-input" id="donationRate" value="50" min="0" max="300" oninput="updateModel()">
+          <div class="control-sub">₹/visitor</div>
+        </div>
+        <div class="control-group" style="margin-top:8px;">
+          <div class="control-label">F&B + Retail Growth <span class="control-value" id="lbl-fbRetailGrowth">2.0%</span></div>
+          <input type="range" id="fbRetailGrowth" min="0" max="15" step="0.5" value="2" oninput="syncSlider(this,'%')">
+        </div>
+        <div class="control-group">
+          <div class="control-label">Donation Growth <span class="control-value" id="lbl-donationGrowth">3.0%</span></div>
+          <input type="range" id="donationGrowth" min="0" max="15" step="0.5" value="3" oninput="syncSlider(this,'%')">
+        </div>
+        <div class="control-group">
+          <div class="control-label">Vet Program Growth <span class="control-value" id="lbl-vetGrowth">2.0%</span></div>
+          <input type="range" id="vetGrowth" min="0" max="20" step="0.5" value="2" oninput="syncSlider(this,'%')">
+        </div>
+        <div class="control-group">
+          <div class="control-label">Adoption Growth <span class="control-value" id="lbl-adoptionGrowth">3.0%</span></div>
+          <input type="range" id="adoptionGrowth" min="0" max="20" step="0.5" value="3" oninput="syncSlider(this,'%')">
+        </div>
+      </div>
+    </div>
+
+    <!-- VET PROGRAMS -->
+    <div class="accordion-section">
+      <button class="accordion-btn" onclick="toggleAccordion(this)">
+        Veterinary Programs <span class="accordion-icon">▼</span>
+      </button>
+      <div class="accordion-body">
+        <div class="control-sub" style="margin-bottom:10px;">Revenue = Daily Rate × Cohorts × Participants × Days</div>
+        <div class="control-group">
+          <div class="control-label">Domestic CPD — Ortho &amp; Neuro</div>
+          <div class="control-row">
+            <div>
+              <input type="number" class="control-input" id="vet1Rate" value="14500" min="0" oninput="updateModel()">
+              <div class="control-sub">₹/day</div>
+            </div>
+            <div>
+              <input type="number" class="control-input" id="vet1Cohorts" value="20" min="0" oninput="updateModel()">
+              <div class="control-sub">cohorts/yr</div>
+            </div>
+          </div>
+          <div class="control-row" style="margin-top:6px;">
+            <div>
+              <input type="number" class="control-input" id="vet1Part" value="15" min="0" oninput="updateModel()">
+              <div class="control-sub">participants</div>
+            </div>
+            <div>
+              <input type="number" class="control-input" id="vet1Days" value="7" min="0" oninput="updateModel()">
+              <div class="control-sub">days</div>
+            </div>
+          </div>
+        </div>
+        <div class="control-group">
+          <div class="control-label">14-Day International Residency</div>
+          <div class="control-row">
+            <div>
+              <input type="number" class="control-input" id="vet2Rate" value="8800" min="0" oninput="updateModel()">
+              <div class="control-sub">₹/day</div>
+            </div>
+            <div>
+              <input type="number" class="control-input" id="vet2Cohorts" value="10" min="0" oninput="updateModel()">
+              <div class="control-sub">cohorts/yr</div>
+            </div>
+          </div>
+          <div class="control-row" style="margin-top:6px;">
+            <div>
+              <input type="number" class="control-input" id="vet2Part" value="8" min="0" oninput="updateModel()">
+              <div class="control-sub">participants</div>
+            </div>
+            <div>
+              <input type="number" class="control-input" id="vet2Days" value="14" min="0" oninput="updateModel()">
+              <div class="control-sub">days</div>
+            </div>
+          </div>
+        </div>
+        <div class="control-group">
+          <div class="control-label">6-Month Vocational Diploma</div>
+          <div class="control-row">
+            <div>
+              <input type="number" class="control-input" id="vet3Rate" value="3200" min="0" oninput="updateModel()">
+              <div class="control-sub">₹/day</div>
+            </div>
+            <div>
+              <input type="number" class="control-input" id="vet3Cohorts" value="2" min="0" oninput="updateModel()">
+              <div class="control-sub">cohorts/yr</div>
+            </div>
+          </div>
+          <div class="control-row" style="margin-top:6px;">
+            <div>
+              <input type="number" class="control-input" id="vet3Part" value="15" min="0" oninput="updateModel()">
+              <div class="control-sub">participants</div>
+            </div>
+            <div>
+              <input type="number" class="control-input" id="vet3Days" value="180" min="0" oninput="updateModel()">
+              <div class="control-sub">days</div>
+            </div>
+          </div>
+        </div>
+        <div class="control-group">
+          <div class="control-label">Premium Intl CPD — Surgical Track</div>
+          <div class="control-row">
+            <div>
+              <input type="number" class="control-input" id="vet4Rate" value="20000" min="0" oninput="updateModel()">
+              <div class="control-sub">₹/day</div>
+            </div>
+            <div>
+              <input type="number" class="control-input" id="vet4Cohorts" value="8" min="0" oninput="updateModel()">
+              <div class="control-sub">cohorts/yr</div>
+            </div>
+          </div>
+          <div class="control-row" style="margin-top:6px;">
+            <div>
+              <input type="number" class="control-input" id="vet4Part" value="8" min="0" oninput="updateModel()">
+              <div class="control-sub">participants</div>
+            </div>
+            <div>
+              <input type="number" class="control-input" id="vet4Days" value="15" min="0" oninput="updateModel()">
+              <div class="control-sub">days</div>
+            </div>
+          </div>
+        </div>
+        <div class="control-group">
+          <div class="control-label">Pre-Vet Voluntourism Week</div>
+          <div class="control-row">
+            <div>
+              <input type="number" class="control-input" id="vet5Rate" value="5300" min="0" oninput="updateModel()">
+              <div class="control-sub">₹/day</div>
+            </div>
+            <div>
+              <input type="number" class="control-input" id="vet5Cohorts" value="12" min="0" oninput="updateModel()">
+              <div class="control-sub">cohorts/yr</div>
+            </div>
+          </div>
+          <div class="control-row" style="margin-top:6px;">
+            <div>
+              <input type="number" class="control-input" id="vet5Part" value="8" min="0" oninput="updateModel()">
+              <div class="control-sub">participants</div>
+            </div>
+            <div>
+              <input type="number" class="control-input" id="vet5Days" value="27" min="0" oninput="updateModel()">
+              <div class="control-sub">days</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ADOPTIONS -->
+    <div class="accordion-section">
+      <button class="accordion-btn" onclick="toggleAccordion(this)">
+        Adoptions &amp; Sponsorships <span class="accordion-icon">▼</span>
+      </button>
+      <div class="accordion-body">
+        <div class="control-sub" style="margin-bottom:10px;">Annual sponsorship prices &amp; volumes</div>
+        <div class="control-row">
+          <div class="control-group">
+            <div class="control-label">Elephant Price</div>
+            <input type="number" class="control-input" id="elephantPrice" value="400000" min="0" oninput="updateModel()">
+            <div class="control-sub">₹/yr</div>
+          </div>
+          <div class="control-group">
+            <div class="control-label">Count</div>
+            <input type="number" class="control-input" id="elephantCount" value="80" min="0" oninput="updateModel()">
+            <div class="control-sub">sponsors</div>
+          </div>
+        </div>
+        <div class="control-row" style="margin-top:8px;">
+          <div class="control-group">
+            <div class="control-label">Cow Price</div>
+            <input type="number" class="control-input" id="cowPrice" value="30000" min="0" oninput="updateModel()">
+            <div class="control-sub">₹/yr</div>
+          </div>
+          <div class="control-group">
+            <div class="control-label">Count</div>
+            <input type="number" class="control-input" id="cowCount" value="200" min="0" oninput="updateModel()">
+          </div>
+        </div>
+        <div class="control-row" style="margin-top:8px;">
+          <div class="control-group">
+            <div class="control-label">Dog Price</div>
+            <input type="number" class="control-input" id="dogPrice" value="20000" min="0" oninput="updateModel()">
+            <div class="control-sub">₹/yr</div>
+          </div>
+          <div class="control-group">
+            <div class="control-label">Count</div>
+            <input type="number" class="control-input" id="dogCount" value="50" min="0" oninput="updateModel()">
+          </div>
+        </div>
+        <div class="control-group" style="margin-top:8px;">
+          <div class="control-label">Other Animals (Lakhs)</div>
+          <input type="number" class="control-input" id="otherAdopt" value="40" min="0" step="0.5" oninput="updateModel()">
+          <div class="control-sub">Horses, camels, goats, birds, etc.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- OPERATING COSTS -->
+    <div class="accordion-section">
+      <button class="accordion-btn" onclick="toggleAccordion(this)">
+        Operating Costs <span class="accordion-icon">▼</span>
+      </button>
+      <div class="accordion-body">
+        <div class="control-sub" style="margin-bottom:10px;">Staffing (55 FTEs total)</div>
+        <div class="control-row">
+          <div class="control-group">
+            <div class="control-label">Caregivers (30)</div>
+            <input type="number" class="control-input" id="caregiverSalary" value="25000" min="0" oninput="updateModel()">
+            <div class="control-sub">₹/mo</div>
+          </div>
+          <div class="control-group">
+            <div class="control-label">Veterinarians (10)</div>
+            <input type="number" class="control-input" id="vetSalary" value="65000" min="0" oninput="updateModel()">
+            <div class="control-sub">₹/mo</div>
+          </div>
+        </div>
+        <div class="control-row" style="margin-top:8px;">
+          <div class="control-group">
+            <div class="control-label">Coordinators (5)</div>
+            <input type="number" class="control-input" id="coordSalary" value="30000" min="0" oninput="updateModel()">
+            <div class="control-sub">₹/mo</div>
+          </div>
+          <div class="control-group">
+            <div class="control-label">Admin/Mgmt (5)</div>
+            <input type="number" class="control-input" id="adminSalary" value="25000" min="0" oninput="updateModel()">
+            <div class="control-sub">₹/mo</div>
+          </div>
+        </div>
+        <div class="control-row" style="margin-top:8px;">
+          <div class="control-group">
+            <div class="control-label">Security (5)</div>
+            <input type="number" class="control-input" id="secSalary" value="14000" min="0" oninput="updateModel()">
+            <div class="control-sub">₹/mo</div>
+          </div>
+          <div class="control-group">
+            <div class="control-label">Benefits</div>
+            <input type="number" class="control-input" id="benefitsPct" value="13" min="0" max="50" oninput="updateModel()">
+            <div class="control-sub">% of salary</div>
+          </div>
+        </div>
+        <div class="control-group" style="margin-top:8px;">
+          <div class="control-label">Labor Growth <span class="control-value" id="lbl-laborGrowth">3.0%</span></div>
+          <input type="range" id="laborGrowth" min="0" max="15" step="0.5" value="3" oninput="syncSlider(this,'%')">
+        </div>
+        <div class="control-sub" style="margin-bottom:10px;margin-top:12px;">Animal Care &amp; Facilities</div>
+        <div class="control-row">
+          <div class="control-group">
+            <div class="control-label">Animals</div>
+            <input type="number" class="control-input" id="animalCount" value="180" min="0" oninput="updateModel()">
+            <div class="control-sub">total animals</div>
+          </div>
+          <div class="control-group">
+            <div class="control-label">Care Cost</div>
+            <input type="number" class="control-input" id="carePerAnimal" value="10000" min="0" oninput="updateModel()">
+            <div class="control-sub">₹/animal/mo</div>
+          </div>
+        </div>
+        <div class="control-row" style="margin-top:8px;">
+          <div class="control-group">
+            <div class="control-label">Utilities</div>
+            <input type="number" class="control-input" id="utilitiesMonthly" value="70000" min="0" oninput="updateModel()">
+            <div class="control-sub">₹/mo</div>
+          </div>
+          <div class="control-group">
+            <div class="control-label">Maintenance</div>
+            <input type="number" class="control-input" id="maintenanceMonthly" value="85000" min="0" oninput="updateModel()">
+            <div class="control-sub">₹/mo</div>
+          </div>
+        </div>
+        <div class="control-group" style="margin-top:8px;">
+          <div class="control-label">Opex Growth <span class="control-value" id="lbl-opexGrowth">5.0%</span></div>
+          <input type="range" id="opexGrowth" min="0" max="20" step="0.5" value="5" oninput="syncSlider(this,'%')">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- KPI CARDS -->
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-label">FY2027 Total Revenue</div>
+        <div class="kpi-value" id="kpi-rev27"><span class="kpi-unit">₹</span>—</div>
+        <div class="kpi-sub" id="kpi-rev27-sub">Loading…</div>
+      </div>
+      <div class="kpi-card green">
+        <div class="kpi-label">FY2027 NOI</div>
+        <div class="kpi-value" id="kpi-noi27"><span class="kpi-unit">₹</span>—</div>
+        <div class="kpi-sub" id="kpi-noi27-sub">—</div>
+      </div>
+      <div class="kpi-card gold">
+        <div class="kpi-label">FY2027 NOI Margin</div>
+        <div class="kpi-value" id="kpi-margin27">—</div>
+        <div class="kpi-sub" id="kpi-margin27-sub">—</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">FY2031 Total Revenue</div>
+        <div class="kpi-value" id="kpi-rev31"><span class="kpi-unit">₹</span>—</div>
+        <div class="kpi-sub" id="kpi-rev31-sub">—</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">FY2027 Visitors</div>
+        <div class="kpi-value" id="kpi-visitors">—</div>
+        <div class="kpi-sub" id="kpi-visitors-sub">—</div>
+      </div>
+    </div>
+
+    <!-- CHARTS -->
+    <div class="charts-grid">
+      <div class="chart-card">
+        <div class="chart-title">Revenue by Category — 5-Year Projection</div>
+        <div class="chart-subtitle">₹ in Lakhs · Stacked by revenue stream</div>
+        <div class="chart-wrap"><canvas id="revChart"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">NOI &amp; Margin Trend</div>
+        <div class="chart-subtitle">Net Operating Income (₹L) and margin (%)</div>
+        <div class="chart-wrap"><canvas id="noiChart"></canvas></div>
+      </div>
+    </div>
+
+    <!-- VISITOR FOOTFALL TABLE -->
+    <div class="visitor-card">
+      <div class="table-header">
+        <div class="table-title">Projected Visitor Footfall</div>
+        <div class="table-note">FY2027 base = FY2026 Forecast | All years in whole visitors</div>
+      </div>
+      <table class="visitor-table" id="visitorTable">
+        <thead>
+          <tr>
+            <th>Segment</th>
+            <th>FY2027</th><th>FY2028</th><th>FY2029</th><th>FY2030</th><th>FY2031</th>
+          </tr>
+        </thead>
+        <tbody id="visitorBody"></tbody>
+      </table>
+    </div>
+
+    <!-- 5-YEAR P&L TABLE -->
+    <div class="table-card">
+      <div class="table-header">
+        <div class="table-title">5-Year Income Statement</div>
+        <div class="table-note">All figures in ₹ Lakhs · FY2027 base drawn from FY2026 Forecast</div>
+      </div>
+      <table class="pnl-table" id="pnlTable">
+        <thead>
+          <tr>
+            <th>Line Item</th>
+            <th>FY2027</th><th>FY2028</th><th>FY2029</th><th>FY2030</th><th>FY2031</th>
+          </tr>
+        </thead>
+        <tbody id="pnlBody"></tbody>
+      </table>
+    </div>
+
+    <!-- SENSITIVITY ANALYSIS -->
+    <div class="sens-card">
+      <div class="table-header">
+        <div class="table-title">Sensitivity: FY2027 Total Revenue vs. Individual Entry Fee (Basic) & Visitor Growth</div>
+        <div class="table-note">All other assumptions held constant · ₹ Lakhs</div>
+      </div>
+      <table class="sens-table" id="sensTable">
+        <thead>
+          <tr id="sensHead"></tr>
+        </thead>
+        <tbody id="sensBody"></tbody>
+      </table>
+    </div>
+
+    <div class="footer">
+      Jivamaitridham (JMD) Financial Model · Prepared by IBD · Confidential Draft · FY2027–FY2031 Projections
+    </div>
+  </div>
+</div>
+
+<script>
+/* ====================================================
+   MODEL ENGINE
+   ==================================================== */
+
+const BASE = {
+  // 2026 FC visitor counts (FY2027 base = no additional growth year 1)
+  indivBase: 751318,
+  schoolBase: 5792,
+  corpBase: 11422,
+};
+
+function getParams() {
+  const n = id => parseFloat(document.getElementById(id).value) || 0;
+  return {
+    indivGrowth: n('indivGrowth'),
+    schoolGrowth: n('schoolGrowth'),
+    corpGrowth: n('corpGrowth'),
+    indivBasicPct: n('indivBasicPct') / 100,
+    corpBasicPct: 0.90,
+
+    indivBasicFee: n('indivBasicFee'),
+    indivPremiumFee: n('indivPremiumFee'),
+    schoolBasicFee: n('schoolBasicFee'),
+    schoolPremiumFee: n('schoolPremiumFee'),
+    corpBasicFee: n('corpBasicFee'),
+    corpPremiumFee: n('corpPremiumFee'),
+
+    tourUptake: n('tourUptake') / 100,
+    pettingUptake: n('pettingUptake') / 100,
+    aviaryUptake: n('aviaryUptake') / 100,
+    boatUptake: n('boatUptake') / 100,
+
+    fbRate: n('fbRate'),
+    retailRate: n('retailRate'),
+    donationRate: n('donationRate'),
+    fbRetailGrowth: n('fbRetailGrowth'),
+    donationGrowth: n('donationGrowth'),
+    vetGrowth: n('vetGrowth'),
+    adoptionGrowth: n('adoptionGrowth'),
+
+    vet1Rate: n('vet1Rate'), vet1Cohorts: n('vet1Cohorts'), vet1Part: n('vet1Part'), vet1Days: n('vet1Days'),
+    vet2Rate: n('vet2Rate'), vet2Cohorts: n('vet2Cohorts'), vet2Part: n('vet2Part'), vet2Days: n('vet2Days'),
+    vet3Rate: n('vet3Rate'), vet3Cohorts: n('vet3Cohorts'), vet3Part: n('vet3Part'), vet3Days: n('vet3Days'),
+    vet4Rate: n('vet4Rate'), vet4Cohorts: n('vet4Cohorts'), vet4Part: n('vet4Part'), vet4Days: n('vet4Days'),
+    vet5Rate: n('vet5Rate'), vet5Cohorts: n('vet5Cohorts'), vet5Part: n('vet5Part'), vet5Days: n('vet5Days'),
+
+    elephantPrice: n('elephantPrice'), elephantCount: n('elephantCount'),
+    cowPrice: n('cowPrice'), cowCount: n('cowCount'),
+    dogPrice: n('dogPrice'), dogCount: n('dogCount'),
+    otherAdopt: n('otherAdopt'),
+
+    caregiverSalary: n('caregiverSalary'), vetSalary: n('vetSalary'),
+    coordSalary: n('coordSalary'), adminSalary: n('adminSalary'),
+    secSalary: n('secSalary'), benefitsPct: n('benefitsPct') / 100,
+    laborGrowth: n('laborGrowth'),
+
+    animalCount: n('animalCount'), carePerAnimal: n('carePerAnimal'),
+    utilitiesMonthly: n('utilitiesMonthly'), maintenanceMonthly: n('maintenanceMonthly'),
+    opexGrowth: n('opexGrowth'),
+  };
+}
+
+function computeYear(p, yearIdx) {
+  // yearIdx 0 = FY2027 (base), 1 = FY2028, ...
+  const gr = (rate, n) => Math.pow(1 + rate / 100, n);
+
+  // Visitors: FY2027 = base (year 0 growth), FY2028 = base × g^1, etc.
+  const indivV = BASE.indivBase * gr(p.indivGrowth, yearIdx);
+  const schoolV = BASE.schoolBase * gr(p.schoolGrowth, yearIdx);
+  const corpV = BASE.corpBase * gr(p.corpGrowth, yearIdx);
+  const totalV = indivV + schoolV + corpV;
+
+  // Entry Fees (₹L)
+  const indivFee = indivV * (p.indivBasicPct * p.indivBasicFee + (1 - p.indivBasicPct) * p.indivPremiumFee) / 1e5;
+  const schoolFee = schoolV * (0.90 * p.schoolBasicFee + 0.10 * p.schoolPremiumFee) / 1e5;
+  const corpFee = corpV * (p.corpBasicPct * p.corpBasicFee + (1 - p.corpBasicPct) * p.corpPremiumFee) / 1e5;
+  const entryFees = indivFee + schoolFee + corpFee;
+
+  // Add-On Experiences (₹L) — individual visitors only, no separate rate growth
+  const addOns = indivV * (
+    p.tourUptake * 100 +
+    p.pettingUptake * 50 +
+    p.aviaryUptake * 50 +
+    p.boatUptake * 20
+  ) / 1e5;
+
+  // Other Income — grow from FY2027 base at fixed rates
+  const fb27 = BASE.indivBase * (p.fbRate + p.retailRate) / 1e5 +
+               BASE.schoolBase * (p.fbRate + p.retailRate) / 1e5 +
+               BASE.corpBase * (p.fbRate + p.retailRate) / 1e5;
+  const don27 = (BASE.indivBase + BASE.schoolBase + BASE.corpBase) * p.donationRate / 1e5;
+  const fbRetail = fb27 * gr(p.fbRetailGrowth, yearIdx);
+  const donation = don27 * gr(p.donationGrowth, yearIdx);
+  const otherIncome = fbRetail + donation;
+
+  // Vet Programs — grow from FY2027 base
+  const vetBase27 = (
+    p.vet1Rate * p.vet1Cohorts * p.vet1Part * p.vet1Days +
+    p.vet2Rate * p.vet2Cohorts * p.vet2Part * p.vet2Days +
+    p.vet3Rate * p.vet3Cohorts * p.vet3Part * p.vet3Days +
+    p.vet4Rate * p.vet4Cohorts * p.vet4Part * p.vet4Days +
+    p.vet5Rate * p.vet5Cohorts * p.vet5Part * p.vet5Days
+  ) / 1e5;
+  const vetRevenue = vetBase27 * gr(p.vetGrowth, yearIdx);
+
+  // Adoptions — grow from FY2027 base
+  const adoptBase27 = (p.elephantPrice * p.elephantCount + p.cowPrice * p.cowCount +
+                       p.dogPrice * p.dogCount) / 1e5 + p.otherAdopt;
+  const adoptions = adoptBase27 * gr(p.adoptionGrowth, yearIdx);
+
+  const totalRevenue = entryFees + addOns + otherIncome + vetRevenue + adoptions;
+
+  // Labor
+  const baseSalaries = (30 * p.caregiverSalary + 10 * p.vetSalary + 5 * p.coordSalary +
+                        5 * p.adminSalary + 5 * p.secSalary) * 12;
+  const labor27 = baseSalaries * (1 + p.benefitsPct) / 1e5;
+  const labor = labor27 * gr(p.laborGrowth, yearIdx);
+
+  const animalCare27 = p.animalCount * p.carePerAnimal * 12 / 1e5;
+  const utilities27 = p.utilitiesMonthly * 12 / 1e5;
+  const maintenance27 = p.maintenanceMonthly * 12 / 1e5;
+  const animalCare = animalCare27 * gr(p.opexGrowth, yearIdx);
+  const utilities = utilities27 * gr(p.opexGrowth, yearIdx);
+  const maintenance = maintenance27 * gr(p.opexGrowth, yearIdx);
+
+  const totalExpenses = labor + animalCare + utilities + maintenance;
+  const noi = totalRevenue - totalExpenses;
+  const noiMargin = totalRevenue > 0 ? noi / totalRevenue : 0;
+
+  return {
+    visitors: { individual: indivV, school: schoolV, corporate: corpV, total: totalV },
+    entryFees, addOns, otherIncome, fbRetail, donation,
+    vetRevenue, adoptions, totalRevenue,
+    labor, animalCare, utilities, maintenance, totalExpenses,
+    noi, noiMargin,
+    vetBase27, adoptBase27
+  };
+}
+
+function computeModel() {
+  const p = getParams();
+  return [0,1,2,3,4].map(i => computeYear(p, i));
+}
+
+/* ====================================================
+   FORMATTERS
+   ==================================================== */
+const YEARS = ['FY2027','FY2028','FY2029','FY2030','FY2031'];
+
+function fL(v, dec=1) {
+  if (v == null || isNaN(v)) return '—';
+  return v.toLocaleString('en-IN', { minimumFractionDigits: dec, maximumFractionDigits: dec });
+}
+function fPct(v) { return (v * 100).toFixed(1) + '%'; }
+function fV(v) { return Math.round(v).toLocaleString('en-IN'); }
+function fCr(v) { return '₹' + fL(v / 100, 1) + ' Cr'; }
+
+/* ====================================================
+   CHARTS
+   ==================================================== */
+let revChart, noiChart;
+
+const COLORS = {
+  entryFees: '#1B2B4D',
+  addOns: '#2E5EA8',
+  otherIncome: '#5B8AD6',
+  vetRevenue: '#C8962E',
+  adoptions: '#E8C57A',
+};
+
+function initCharts() {
+  const ctx1 = document.getElementById('revChart').getContext('2d');
+  revChart = new Chart(ctx1, {
+    type: 'bar',
+    data: {
+      labels: YEARS,
+      datasets: [
+        { label: 'Entry Fees', data: [], backgroundColor: COLORS.entryFees, borderRadius: 2 },
+        { label: 'Add-On Experiences', data: [], backgroundColor: COLORS.addOns, borderRadius: 2 },
+        { label: 'F&B / Retail / Donation', data: [], backgroundColor: COLORS.otherIncome, borderRadius: 2 },
+        { label: 'Veterinary Programs', data: [], backgroundColor: COLORS.vetRevenue, borderRadius: 2 },
+        { label: 'Adoptions & Sponsorships', data: [], backgroundColor: COLORS.adoptions, borderRadius: 2 },
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'bottom', labels: { font: { size: 11, family: 'Inter' }, boxWidth: 12, padding: 12 } },
+        tooltip: {
+          callbacks: {
+            label: ctx => ` ${ctx.dataset.label}: ₹${fL(ctx.raw)} L`
+          }
+        }
+      },
+      scales: {
+        x: { stacked: true, grid: { display: false }, ticks: { font: { size: 12, family: 'Inter' } } },
+        y: { stacked: true, grid: { color: '#F0F0F0' }, ticks: { font: { size: 11, family: 'Inter' }, callback: v => '₹' + fL(v) + 'L' } }
+      }
+    }
+  });
+
+  const ctx2 = document.getElementById('noiChart').getContext('2d');
+  noiChart = new Chart(ctx2, {
+    type: 'bar',
+    data: {
+      labels: YEARS,
+      datasets: [
+        { label: 'NOI (₹L)', data: [], backgroundColor: '#E6F4ED', borderColor: '#2D7A4F', borderWidth: 2, borderRadius: 4, yAxisID: 'y' },
+        { label: 'NOI Margin (%)', data: [], type: 'line', borderColor: '#C8962E', backgroundColor: 'transparent', borderWidth: 2.5, pointRadius: 4, pointBackgroundColor: '#C8962E', yAxisID: 'y2' }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'bottom', labels: { font: { size: 11, family: 'Inter' }, boxWidth: 12, padding: 12 } },
+        tooltip: {
+          callbacks: {
+            label: ctx => ctx.datasetIndex === 0
+              ? ` NOI: ₹${fL(ctx.raw)} L`
+              : ` Margin: ${ctx.raw.toFixed(1)}%`
+          }
+        }
+      },
+      scales: {
+        x: { grid: { display: false }, ticks: { font: { size: 12, family: 'Inter' } } },
+        y: { position: 'left', grid: { color: '#F0F0F0' }, ticks: { font: { size: 11, family: 'Inter' }, callback: v => '₹' + fL(v) + 'L' } },
+        y2: { position: 'right', grid: { display: false }, ticks: { font: { size: 11, family: 'Inter' }, callback: v => v.toFixed(0) + '%' }, min: 0, max: 100 }
+      }
+    }
+  });
+}
+
+function updateCharts(data) {
+  revChart.data.datasets[0].data = data.map(d => +d.entryFees.toFixed(1));
+  revChart.data.datasets[1].data = data.map(d => +d.addOns.toFixed(1));
+  revChart.data.datasets[2].data = data.map(d => +d.otherIncome.toFixed(1));
+  revChart.data.datasets[3].data = data.map(d => +d.vetRevenue.toFixed(1));
+  revChart.data.datasets[4].data = data.map(d => +d.adoptions.toFixed(1));
+  revChart.update('none');
+
+  noiChart.data.datasets[0].data = data.map(d => +d.noi.toFixed(1));
+  noiChart.data.datasets[1].data = data.map(d => +(d.noiMargin * 100).toFixed(1));
+  noiChart.update('none');
+}
+
+/* ====================================================
+   TABLE RENDERERS
+   ==================================================== */
+function renderPnL(data) {
+  const tbody = document.getElementById('pnlBody');
+  const vals = (fn) => data.map(d => `<td>${fL(fn(d))}</td>`).join('');
+  const pct  = (fn) => data.map(d => `<td>${fPct(fn(d))}</td>`).join('');
+
+  tbody.innerHTML = `
+    <tr class="row-section"><td colspan="6">Revenue</td></tr>
+    <tr class="row-indent"><td>Entry Fees — Individual</td>${vals(d=>d.entryFees - (BASE.schoolBase * (0.90*getParams().schoolBasicFee + 0.10*getParams().schoolPremiumFee)/1e5 * Math.pow(1+getParams().schoolGrowth/100, data.indexOf(d))) - (BASE.corpBase * (0.90*getParams().corpBasicFee + 0.10*getParams().corpPremiumFee)/1e5 * Math.pow(1+getParams().corpGrowth/100, data.indexOf(d))))}</tr>
+    <tr class="row-indent"><td>Entry Fees — School Groups</td>${data.map((d,i) => `<td>${fL(BASE.schoolBase * Math.pow(1+getParams().schoolGrowth/100,i) * (0.90*getParams().schoolBasicFee + 0.10*getParams().schoolPremiumFee)/1e5)}</td>`).join('')}</tr>
+    <tr class="row-indent"><td>Entry Fees — Corporate Groups</td>${data.map((d,i) => `<td>${fL(BASE.corpBase * Math.pow(1+getParams().corpGrowth/100,i) * (0.90*getParams().corpBasicFee + 0.10*getParams().corpPremiumFee)/1e5)}</td>`).join('')}</tr>
+    <tr class="row-subtotal"><td>  Total Entry Fees</td>${vals(d=>d.entryFees)}</tr>
+    <tr class="row-indent"><td>Shelter Guided Tour</td>${data.map((d,i) => `<td>${fL(BASE.indivBase * Math.pow(1+getParams().indivGrowth/100,i) * getParams().tourUptake * 100 / 1e5)}</td>`).join('')}</tr>
+    <tr class="row-indent"><td>Petting Area</td>${data.map((d,i) => `<td>${fL(BASE.indivBase * Math.pow(1+getParams().indivGrowth/100,i) * getParams().pettingUptake * 50 / 1e5)}</td>`).join('')}</tr>
+    <tr class="row-indent"><td>Aviary Center</td>${data.map((d,i) => `<td>${fL(BASE.indivBase * Math.pow(1+getParams().indivGrowth/100,i) * getParams().aviaryUptake * 50 / 1e5)}</td>`).join('')}</tr>
+    <tr class="row-indent"><td>Lake Boat Ride</td>${data.map((d,i) => `<td>${fL(BASE.indivBase * Math.pow(1+getParams().indivGrowth/100,i) * getParams().boatUptake * 20 / 1e5)}</td>`).join('')}</tr>
+    <tr class="row-subtotal"><td>  Total Add-On Experiences</td>${vals(d=>d.addOns)}</tr>
+    <tr class="row-indent"><td>F&B Revenue</td>${data.map((d,i) => `<td>${fL(d.fbRetail * getParams().fbRate / (getParams().fbRate + getParams().retailRate || 1))}</td>`).join('')}</tr>
+    <tr class="row-indent"><td>Retail Revenue</td>${data.map((d,i) => `<td>${fL(d.fbRetail * getParams().retailRate / (getParams().fbRate + getParams().retailRate || 1))}</td>`).join('')}</tr>
+    <tr class="row-indent"><td>Donations &amp; CSR</td>${vals(d=>d.donation)}</tr>
+    <tr class="row-subtotal"><td>  Total Other Income</td>${vals(d=>d.otherIncome)}</tr>
+    <tr class="row-indent"><td>Veterinary Programs</td>${vals(d=>d.vetRevenue)}</tr>
+    <tr class="row-indent"><td>Adoptions &amp; Sponsorships</td>${vals(d=>d.adoptions)}</tr>
+    <tr class="row-total"><td>TOTAL REVENUE</td>${vals(d=>d.totalRevenue)}</tr>
+
+    <tr class="row-section"><td colspan="6">Operating Expenses</td></tr>
+    <tr class="row-indent"><td>Labor (incl. Benefits)</td>${vals(d=>d.labor)}</tr>
+    <tr class="row-indent"><td>Animal Care</td>${vals(d=>d.animalCare)}</tr>
+    <tr class="row-indent"><td>Utilities</td>${vals(d=>d.utilities)}</tr>
+    <tr class="row-indent"><td>Maintenance</td>${vals(d=>d.maintenance)}</tr>
+    <tr class="row-subtotal"><td>  Total Operating Expenses</td>${vals(d=>d.totalExpenses)}</tr>
+
+    <tr class="row-noi"><td>NET OPERATING INCOME (NOI)</td>${vals(d=>d.noi)}</tr>
+    <tr class="row-margin"><td>  NOI Margin</td>${pct(d=>d.noiMargin)}</tr>
+  `;
+}
+
+function renderVisitors(data) {
+  const tbody = document.getElementById('visitorBody');
+  const p = getParams();
+  const gr = (rate, n) => Math.pow(1 + rate / 100, n);
+  tbody.innerHTML = `
+    <tr class="row-indent"><td>Individual / Family</td>${data.map((d,i) => `<td>${fV(BASE.indivBase * gr(p.indivGrowth, i))}</td>`).join('')}</tr>
+    <tr class="row-indent"><td>School Groups</td>${data.map((d,i) => `<td>${fV(BASE.schoolBase * gr(p.schoolGrowth, i))}</td>`).join('')}</tr>
+    <tr class="row-indent"><td>Corporate (Day)</td>${data.map((d,i) => `<td>${fV(7224 / (7224+3159) * BASE.corpBase * gr(p.corpGrowth, i))}</td>`).join('')}</tr>
+    <tr class="row-indent"><td>Corporate (Overnight)</td>${data.map((d,i) => `<td>${fV(3159 / (7224+3159) * BASE.corpBase * gr(p.corpGrowth, i))}</td>`).join('')}</tr>
+    <tr class="row-total-v"><td>Total Visitors</td>${data.map(d => `<td>${fV(d.visitors.total)}</td>`).join('')}</tr>
+  `;
+}
+
+function renderSensitivity() {
+  const p = getParams();
+  const fees = [60, 80, 96, 100, 128, 150, 175, 200, 250];
+  const growths = [0, 2, 5, 8, 10];
+
+  const head = document.getElementById('sensHead');
+  head.innerHTML = `<th>Basic Fee (₹) \\ Indiv. Growth</th>` + growths.map(g => `<th>${g}%</th>`).join('');
+
+  const tbody = document.getElementById('sensBody');
+  const baseFee = p.indivBasicFee;
+  const baseGrowth = p.indivGrowth;
+
+  tbody.innerHTML = fees.map(fee => {
+    const cells = growths.map(g => {
+      const pp = {...p, indivBasicFee: fee, indivGrowth: g};
+      const d = computeYear(pp, 0);
+      const rev = d.totalRevenue;
+      const isBase = Math.abs(fee - baseFee) < 5 && Math.abs(g - baseGrowth) < 1;
+      const cls = isBase ? 'sens-base' : (rev > computeYear(p, 0).totalRevenue ? 'sens-high' : rev < computeYear(p, 0).totalRevenue - 50 ? 'sens-low' : '');
+      return `<td class="${cls}">₹${fL(rev)}</td>`;
+    }).join('');
+    return `<tr><td>₹${fee}</td>${cells}</tr>`;
+  }).join('');
+}
+
+/* ====================================================
+   KPI UPDATE
+   ==================================================== */
+function updateKPIs(data) {
+  const d27 = data[0];
+  const d31 = data[4];
+
+  document.getElementById('kpi-rev27').innerHTML = `<span class="kpi-unit">₹</span>${fL(d27.totalRevenue)} L`;
+  document.getElementById('kpi-rev27-sub').textContent = `≈ ${fCr(d27.totalRevenue)}`;
+  document.getElementById('kpi-noi27').innerHTML = `<span class="kpi-unit">₹</span>${fL(d27.noi)} L`;
+  document.getElementById('kpi-noi27-sub').textContent = `Expenses: ₹${fL(d27.totalExpenses)} L`;
+  document.getElementById('kpi-margin27').textContent = fPct(d27.noiMargin);
+  document.getElementById('kpi-margin27-sub').textContent = `Revenue − Expenses / Revenue`;
+  document.getElementById('kpi-rev31').innerHTML = `<span class="kpi-unit">₹</span>${fL(d31.totalRevenue)} L`;
+  const cagr = (Math.pow(d31.totalRevenue / d27.totalRevenue, 1/4) - 1) * 100;
+  document.getElementById('kpi-rev31-sub').textContent = `CAGR ${cagr.toFixed(1)}% (FY2027–31)`;
+  document.getElementById('kpi-visitors').textContent = fV(d27.visitors.total);
+  document.getElementById('kpi-visitors-sub').textContent = `Projected FY2027 total`;
+}
+
+/* ====================================================
+   MAIN UPDATE
+   ==================================================== */
+function updateModel() {
+  const data = computeModel();
+  updateKPIs(data);
+  updateCharts(data);
+  renderPnL(data);
+  renderVisitors(data);
+  renderSensitivity();
+}
+
+/* ====================================================
+   SLIDER SYNC
+   ==================================================== */
+function syncSlider(el, suffix) {
+  const lbl = document.getElementById('lbl-' + el.id);
+  if (lbl) lbl.textContent = parseFloat(el.value).toFixed(1) + suffix;
+  updateModel();
+}
+
+/* ====================================================
+   ACCORDION
+   ==================================================== */
+function toggleAccordion(btn) {
+  btn.classList.toggle('open');
+}
+
+/* ====================================================
+   DEFAULTS
+   ==================================================== */
+const DEFAULTS = {
+  indivGrowth: 2, schoolGrowth: 10, corpGrowth: 10, indivBasicPct: 90,
+  indivBasicFee: 128, indivPremiumFee: 496,
+  schoolBasicFee: 96, schoolPremiumFee: 1572,
+  corpBasicFee: 1512, corpPremiumFee: 3584,
+  tourUptake: 23, pettingUptake: 18.4, aviaryUptake: 13.8, boatUptake: 27.6,
+  fbRate: 80, retailRate: 20, donationRate: 50,
+  fbRetailGrowth: 2, donationGrowth: 3, vetGrowth: 2, adoptionGrowth: 3,
+  vet1Rate: 14500, vet1Cohorts: 20, vet1Part: 15, vet1Days: 7,
+  vet2Rate: 8800, vet2Cohorts: 10, vet2Part: 8, vet2Days: 14,
+  vet3Rate: 3200, vet3Cohorts: 2, vet3Part: 15, vet3Days: 180,
+  vet4Rate: 20000, vet4Cohorts: 8, vet4Part: 8, vet4Days: 15,
+  vet5Rate: 5300, vet5Cohorts: 12, vet5Part: 8, vet5Days: 27,
+  elephantPrice: 400000, elephantCount: 80,
+  cowPrice: 30000, cowCount: 200,
+  dogPrice: 20000, dogCount: 50,
+  otherAdopt: 40,
+  caregiverSalary: 25000, vetSalary: 65000, coordSalary: 30000,
+  adminSalary: 25000, secSalary: 14000, benefitsPct: 13,
+  laborGrowth: 3, animalCount: 180, carePerAnimal: 10000,
+  utilitiesMonthly: 70000, maintenanceMonthly: 85000, opexGrowth: 5,
+};
+
+function resetDefaults() {
+  Object.entries(DEFAULTS).forEach(([id, val]) => {
+    const el = document.getElementById(id);
+    if (el) el.value = val;
+    const lbl = document.getElementById('lbl-' + id);
+    if (lbl) {
+      if (el && el.type === 'range') {
+        lbl.textContent = parseFloat(val).toFixed(1) + (id.includes('Pct') || id.toLowerCase().includes('growth') ? '%' : '');
+      }
+    }
+  });
+  // Re-sync all label displays
+  ['indivGrowth','schoolGrowth','corpGrowth','indivBasicPct',
+   'tourUptake','pettingUptake','aviaryUptake','boatUptake',
+   'fbRetailGrowth','donationGrowth','vetGrowth','adoptionGrowth',
+   'laborGrowth','opexGrowth'].forEach(id => {
+    const el = document.getElementById(id);
+    const lbl = document.getElementById('lbl-' + id);
+    if (el && lbl) lbl.textContent = parseFloat(el.value).toFixed(1) + '%';
+  });
+  updateModel();
+}
+
+/* ====================================================
+   INIT
+   ==================================================== */
+document.addEventListener('DOMContentLoaded', () => {
+  initCharts();
+  updateModel();
+});
+</script>
+</body>
+</html>
