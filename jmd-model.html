@@ -5,27 +5,29 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Jivamaitridham — 5-Year Financial Model</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --navy: #1B2B4D;
-  --navy-light: #243660;
-  --gold: #C8962E;
-  --gold-light: #F5E6C8;
-  --green: #2D7A4F;
-  --green-light: #E6F4ED;
+  /* SRLC brand palette — drawn from logo flame */
+  --navy: #5C1A1A;        /* deep maroon (logo base) */
+  --navy-light: #7A2525;  /* mid maroon */
+  --gold: #C8601A;        /* warm orange (middle flame) */
+  --gold-light: #FAF0E6;  /* warm cream tint */
+  --amber: #F0A500;       /* golden yellow (top flame) */
+  --green: #5C7A2A;       /* earthy olive green */
+  --green-light: #EEF4E6;
   --red: #B03A2E;
   --red-light: #FDECEA;
-  --gray-50: #F8F9FA;
-  --gray-100: #F1F3F5;
-  --gray-200: #E9ECEF;
-  --gray-300: #DEE2E6;
-  --gray-400: #ADB5BD;
-  --gray-600: #6C757D;
-  --gray-700: #495057;
-  --gray-900: #212529;
+  --gray-50: #FDFAF6;     /* warm off-white background */
+  --gray-100: #F5EFE8;
+  --gray-200: #EDE4D8;
+  --gray-300: #D9CBBB;
+  --gray-400: #B0A090;
+  --gray-600: #7A6A5A;
+  --gray-700: #4D3D2D;
+  --gray-900: #2A1A0A;
   --white: #FFFFFF;
   --shadow-sm: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
   --shadow: 0 4px 12px rgba(0,0,0,0.08);
@@ -42,6 +44,8 @@ body {
   min-height: 100vh;
 }
 
+.brand-font { font-family: 'Cormorant Garamond', Georgia, serif; }
+
 /* HEADER */
 .header {
   background: var(--navy);
@@ -55,10 +59,7 @@ body {
 .header-left { display: flex; align-items: center; gap: 20px; }
 .header-logo {
   width: 40px; height: 40px;
-  background: var(--gold);
-  border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
-  font-size: 18px; font-weight: 700; color: var(--white);
   flex-shrink: 0;
 }
 .header-title { font-size: 18px; font-weight: 700; letter-spacing: -0.3px; }
@@ -226,7 +227,7 @@ input[type="range"]::-moz-range-thumb {
 .kpi-card.gold::before { background: var(--gold); }
 .kpi-card.green::before { background: var(--green); }
 .kpi-label { font-size: 11px; font-weight: 600; color: var(--gray-600); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
-.kpi-value { font-size: 22px; font-weight: 700; color: var(--gray-900); letter-spacing: -0.5px; }
+.kpi-value { font-size: 22px; font-weight: 700; color: var(--gray-900); letter-spacing: -0.5px; font-family: 'Cormorant Garamond', Georgia, serif; }
 .kpi-unit { font-size: 12px; font-weight: 400; color: var(--gray-600); }
 .kpi-sub { font-size: 11px; color: var(--gray-400); margin-top: 4px; }
 
@@ -422,10 +423,17 @@ input[type="range"]::-moz-range-thumb {
 <!-- HEADER -->
 <div class="header">
   <div class="header-left">
-    <div class="header-logo">J</div>
+    <div class="header-logo">
+      <svg width="28" height="34" viewBox="0 0 28 34" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M14 2 C14 2 8 10 8 18 C8 24 11 28 14 30 C17 28 20 24 20 18 C20 10 14 2 14 2Z" fill="#F0A500"/>
+        <path d="M14 8 C14 8 9 14 9 20 C9 25 11.5 28 14 30 C16.5 28 19 25 19 20 C19 14 14 8 14 8Z" fill="#C8601A"/>
+        <path d="M14 14 C14 14 10 19 10 22 C10 26 12 29 14 31 C16 29 18 26 18 22 C18 19 14 14 14 14Z" fill="#7A2525"/>
+        <ellipse cx="14" cy="32" rx="7" ry="2" fill="#5C1A1A" opacity="0.6"/>
+      </svg>
+    </div>
     <div>
-      <div class="header-title">Jivamaitridham (JMD) — Interactive Financial Model</div>
-      <div class="header-subtitle">SRLC | 5-Year Projections: FY2027 – FY2031 · ₹ in Lakhs</div>
+      <div class="header-title brand-font">Jivamaitridham — Interactive Financial Model</div>
+      <div class="header-subtitle">Shrimad Rajchandra | 5-Year Projections: FY2027 – FY2031 · ₹ in Lakhs</div>
     </div>
   </div>
   <div class="header-right">
@@ -1147,11 +1155,11 @@ function fCr(v) { return '₹' + fL(v / 100, 1) + ' Cr'; }
 let revChart, noiChart;
 
 const COLORS = {
-  entryFees: '#1B2B4D',
-  addOns: '#2E5EA8',
-  otherIncome: '#5B8AD6',
-  vetRevenue: '#C8962E',
-  adoptions: '#E8C57A',
+  entryFees: '#5C1A1A',   // deep maroon
+  addOns: '#7A2525',      // mid maroon
+  otherIncome: '#C8601A', // warm orange
+  vetRevenue: '#F0A500',  // golden amber
+  adoptions: '#F5CC6A',   // light gold
 };
 
 function initCharts() {
@@ -1191,8 +1199,8 @@ function initCharts() {
     data: {
       labels: YEARS,
       datasets: [
-        { label: 'NOI (₹L)', data: [], backgroundColor: '#E6F4ED', borderColor: '#2D7A4F', borderWidth: 2, borderRadius: 4, yAxisID: 'y' },
-        { label: 'NOI Margin (%)', data: [], type: 'line', borderColor: '#C8962E', backgroundColor: 'transparent', borderWidth: 2.5, pointRadius: 4, pointBackgroundColor: '#C8962E', yAxisID: 'y2' }
+        { label: 'NOI (₹L)', data: [], backgroundColor: '#FAF0E6', borderColor: '#C8601A', borderWidth: 2, borderRadius: 4, yAxisID: 'y' },
+        { label: 'NOI Margin (%)', data: [], type: 'line', borderColor: '#F0A500', backgroundColor: 'transparent', borderWidth: 2.5, pointRadius: 4, pointBackgroundColor: '#F0A500', yAxisID: 'y2' }
       ]
     },
     options: {
