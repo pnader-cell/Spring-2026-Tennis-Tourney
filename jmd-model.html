@@ -10,24 +10,24 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  /* SRLC brand palette — drawn from logo flame */
-  --navy: #5C1A1A;        /* deep maroon (logo base) */
-  --navy-light: #7A2525;  /* mid maroon */
-  --gold: #C8601A;        /* warm orange (middle flame) */
-  --gold-light: #FAF0E6;  /* warm cream tint */
-  --amber: #F0A500;       /* golden yellow (top flame) */
-  --green: #5C7A2A;       /* earthy olive green */
+  /* SRLC brand palette — matched from srjmd.org screenshots */
+  --navy: #2A1810;        /* deep dark brown (site footer/header) */
+  --navy-light: #3D1F14;  /* heading text brown */
+  --gold: #9B3F2A;        /* terracotta/rust (icon & accent color) */
+  --gold-light: #F9F5E4;  /* exact cream background */
+  --amber: #C8601A;       /* warm orange (flame middle) */
+  --green: #5C7A2A;
   --green-light: #EEF4E6;
   --red: #B03A2E;
   --red-light: #FDECEA;
-  --gray-50: #FDFAF6;     /* warm off-white background */
-  --gray-100: #F5EFE8;
-  --gray-200: #EDE4D8;
-  --gray-300: #D9CBBB;
-  --gray-400: #B0A090;
-  --gray-600: #7A6A5A;
-  --gray-700: #4D3D2D;
-  --gray-900: #2A1A0A;
+  --gray-50: #F9F5E4;     /* warm cream — main page bg */
+  --gray-100: #F0EAD8;
+  --gray-200: #E5DCC8;
+  --gray-300: #D0C0A8;
+  --gray-400: #B0A080;
+  --gray-600: #7A6450;
+  --gray-700: #4D3520;
+  --gray-900: #2A1810;
   --white: #FFFFFF;
   --shadow-sm: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
   --shadow: 0 4px 12px rgba(0,0,0,0.08);
@@ -104,13 +104,13 @@ body {
   font-weight: 500;
   color: var(--gold);
   background: none;
-  border: 1px solid var(--gold);
-  border-radius: 4px;
-  padding: 4px 10px;
+  border: 1px solid var(--gray-300);
+  border-radius: 20px;
+  padding: 5px 14px;
   cursor: pointer;
   transition: all 0.15s;
 }
-.reset-btn:hover { background: var(--gold); color: var(--white); }
+.reset-btn:hover { background: var(--gray-100); border-color: var(--gold); }
 
 /* ACCORDION */
 .accordion-section { border-bottom: 1px solid var(--gray-200); }
@@ -210,9 +210,9 @@ input[type="range"]::-moz-range-thumb {
 }
 .kpi-card {
   background: var(--white);
-  border-radius: var(--radius);
-  padding: 16px;
-  box-shadow: var(--shadow-sm);
+  border-radius: 12px;
+  padding: 18px;
+  box-shadow: none;
   border: 1px solid var(--gray-200);
   position: relative;
   overflow: hidden;
@@ -224,8 +224,8 @@ input[type="range"]::-moz-range-thumb {
   height: 3px;
   background: var(--navy);
 }
-.kpi-card.gold::before { background: var(--gold); }
-.kpi-card.green::before { background: var(--green); }
+.kpi-card.gold::before { background: var(--amber); }
+.kpi-card.green::before { background: var(--gold); }
 .kpi-label { font-size: 11px; font-weight: 600; color: var(--gray-600); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
 .kpi-value { font-size: 22px; font-weight: 700; color: var(--gray-900); letter-spacing: -0.5px; font-family: 'Cormorant Garamond', Georgia, serif; }
 .kpi-unit { font-size: 12px; font-weight: 400; color: var(--gray-600); }
@@ -240,8 +240,8 @@ input[type="range"]::-moz-range-thumb {
 }
 .chart-card {
   background: var(--white);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-sm);
+  border-radius: 12px;
+  box-shadow: none;
   border: 1px solid var(--gray-200);
   padding: 20px;
 }
@@ -252,8 +252,8 @@ input[type="range"]::-moz-range-thumb {
 /* P&L TABLE */
 .table-card {
   background: var(--white);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-sm);
+  border-radius: 12px;
+  box-shadow: none;
   border: 1px solid var(--gray-200);
   overflow: hidden;
   margin-bottom: 24px;
@@ -328,8 +328,8 @@ input[type="range"]::-moz-range-thumb {
 /* VISITOR TABLE */
 .visitor-card {
   background: var(--white);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-sm);
+  border-radius: 12px;
+  box-shadow: none;
   border: 1px solid var(--gray-200);
   overflow: hidden;
   margin-bottom: 24px;
@@ -362,8 +362,8 @@ input[type="range"]::-moz-range-thumb {
 /* SENSITIVITY */
 .sens-card {
   background: var(--white);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-sm);
+  border-radius: 12px;
+  box-shadow: none;
   border: 1px solid var(--gray-200);
   overflow: hidden;
   margin-bottom: 24px;
@@ -1155,11 +1155,11 @@ function fCr(v) { return '₹' + fL(v / 100, 1) + ' Cr'; }
 let revChart, noiChart;
 
 const COLORS = {
-  entryFees: '#5C1A1A',   // deep maroon
-  addOns: '#7A2525',      // mid maroon
-  otherIncome: '#C8601A', // warm orange
-  vetRevenue: '#F0A500',  // golden amber
-  adoptions: '#F5CC6A',   // light gold
+  entryFees: '#2A1810',   // deep dark brown
+  addOns: '#5C2A1A',      // mid brown
+  otherIncome: '#9B3F2A', // terracotta
+  vetRevenue: '#C8601A',  // warm orange
+  adoptions: '#E8A060',   // light amber
 };
 
 function initCharts() {
@@ -1199,8 +1199,8 @@ function initCharts() {
     data: {
       labels: YEARS,
       datasets: [
-        { label: 'NOI (₹L)', data: [], backgroundColor: '#FAF0E6', borderColor: '#C8601A', borderWidth: 2, borderRadius: 4, yAxisID: 'y' },
-        { label: 'NOI Margin (%)', data: [], type: 'line', borderColor: '#F0A500', backgroundColor: 'transparent', borderWidth: 2.5, pointRadius: 4, pointBackgroundColor: '#F0A500', yAxisID: 'y2' }
+        { label: 'NOI (₹L)', data: [], backgroundColor: '#F9F5E4', borderColor: '#9B3F2A', borderWidth: 2, borderRadius: 4, yAxisID: 'y' },
+        { label: 'NOI Margin (%)', data: [], type: 'line', borderColor: '#C8601A', backgroundColor: 'transparent', borderWidth: 2.5, pointRadius: 4, pointBackgroundColor: '#C8601A', yAxisID: 'y2' }
       ]
     },
     options: {
