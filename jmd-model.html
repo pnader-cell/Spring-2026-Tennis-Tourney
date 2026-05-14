@@ -522,22 +522,66 @@ input[type="range"]::-moz-range-thumb {
         Add-On Experiences <span class="accordion-icon">▼</span>
       </button>
       <div class="accordion-body">
-        <div class="control-sub" style="margin-bottom:10px;">Uptake rates apply to individual visitors</div>
+        <div class="control-sub" style="margin-bottom:12px;">Price (₹/person) and uptake rate per individual visitor</div>
+
         <div class="control-group">
-          <div class="control-label">Shelter Guided Tour (₹100) <span class="control-value" id="lbl-tourUptake">23.0%</span></div>
-          <input type="range" id="tourUptake" min="0" max="60" step="1" value="23" oninput="syncSlider(this,'%')">
+          <div class="control-label" style="font-weight:600;color:var(--gray-900);">Shelter Guided Tour</div>
+          <div class="control-row" style="margin-top:6px;">
+            <div>
+              <div class="control-label">Price</div>
+              <input type="number" class="control-input" id="tourPrice" value="100" min="0" max="2000" oninput="updateModel()">
+              <div class="control-sub">₹/person</div>
+            </div>
+            <div>
+              <div class="control-label">Uptake <span class="control-value" id="lbl-tourUptake">23.0%</span></div>
+              <input type="range" id="tourUptake" min="0" max="60" step="1" value="23" oninput="syncSlider(this,'%')" style="margin-top:8px;">
+            </div>
+          </div>
         </div>
+
         <div class="control-group">
-          <div class="control-label">Petting Area (₹50) <span class="control-value" id="lbl-pettingUptake">18.4%</span></div>
-          <input type="range" id="pettingUptake" min="0" max="60" step="0.5" value="18.4" oninput="syncSlider(this,'%')">
+          <div class="control-label" style="font-weight:600;color:var(--gray-900);">Petting Area</div>
+          <div class="control-row" style="margin-top:6px;">
+            <div>
+              <div class="control-label">Price</div>
+              <input type="number" class="control-input" id="pettingPrice" value="50" min="0" max="2000" oninput="updateModel()">
+              <div class="control-sub">₹/person</div>
+            </div>
+            <div>
+              <div class="control-label">Uptake <span class="control-value" id="lbl-pettingUptake">18.4%</span></div>
+              <input type="range" id="pettingUptake" min="0" max="60" step="0.5" value="18.4" oninput="syncSlider(this,'%')" style="margin-top:8px;">
+            </div>
+          </div>
         </div>
+
         <div class="control-group">
-          <div class="control-label">Aviary Center (₹50) <span class="control-value" id="lbl-aviaryUptake">13.8%</span></div>
-          <input type="range" id="aviaryUptake" min="0" max="60" step="0.5" value="13.8" oninput="syncSlider(this,'%')">
+          <div class="control-label" style="font-weight:600;color:var(--gray-900);">Aviary Center</div>
+          <div class="control-row" style="margin-top:6px;">
+            <div>
+              <div class="control-label">Price</div>
+              <input type="number" class="control-input" id="aviaryPrice" value="50" min="0" max="2000" oninput="updateModel()">
+              <div class="control-sub">₹/person</div>
+            </div>
+            <div>
+              <div class="control-label">Uptake <span class="control-value" id="lbl-aviaryUptake">13.8%</span></div>
+              <input type="range" id="aviaryUptake" min="0" max="60" step="0.5" value="13.8" oninput="syncSlider(this,'%')" style="margin-top:8px;">
+            </div>
+          </div>
         </div>
+
         <div class="control-group">
-          <div class="control-label">Lake Boat Ride (₹20) <span class="control-value" id="lbl-boatUptake">27.6%</span></div>
-          <input type="range" id="boatUptake" min="0" max="60" step="0.5" value="27.6" oninput="syncSlider(this,'%')">
+          <div class="control-label" style="font-weight:600;color:var(--gray-900);">Lake Boat Ride</div>
+          <div class="control-row" style="margin-top:6px;">
+            <div>
+              <div class="control-label">Price</div>
+              <input type="number" class="control-input" id="boatPrice" value="20" min="0" max="2000" oninput="updateModel()">
+              <div class="control-sub">₹/person</div>
+            </div>
+            <div>
+              <div class="control-label">Uptake <span class="control-value" id="lbl-boatUptake">27.6%</span></div>
+              <input type="range" id="boatUptake" min="0" max="60" step="0.5" value="27.6" oninput="syncSlider(this,'%')" style="margin-top:8px;">
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -967,10 +1011,10 @@ function getParams() {
     corpBasicFee: n('corpBasicFee'),
     corpPremiumFee: n('corpPremiumFee'),
 
-    tourUptake: n('tourUptake') / 100,
-    pettingUptake: n('pettingUptake') / 100,
-    aviaryUptake: n('aviaryUptake') / 100,
-    boatUptake: n('boatUptake') / 100,
+    tourUptake: n('tourUptake') / 100,   tourPrice: n('tourPrice'),
+    pettingUptake: n('pettingUptake') / 100, pettingPrice: n('pettingPrice'),
+    aviaryUptake: n('aviaryUptake') / 100,  aviaryPrice: n('aviaryPrice'),
+    boatUptake: n('boatUptake') / 100,    boatPrice: n('boatPrice'),
 
     fbRate: n('fbRate'),
     retailRate: n('retailRate'),
@@ -1020,10 +1064,10 @@ function computeYear(p, yearIdx) {
 
   // Add-On Experiences (₹L) — individual visitors only, no separate rate growth
   const addOns = indivV * (
-    p.tourUptake * 100 +
-    p.pettingUptake * 50 +
-    p.aviaryUptake * 50 +
-    p.boatUptake * 20
+    p.tourUptake * p.tourPrice +
+    p.pettingUptake * p.pettingPrice +
+    p.aviaryUptake * p.aviaryPrice +
+    p.boatUptake * p.boatPrice
   ) / 1e5;
 
   // Other Income — grow from FY2027 base at fixed rates
@@ -1190,22 +1234,23 @@ function updateCharts(data) {
    ==================================================== */
 function renderPnL(data) {
   const tbody = document.getElementById('pnlBody');
+  const p = getParams();
   const vals = (fn) => data.map(d => `<td>${fL(fn(d))}</td>`).join('');
   const pct  = (fn) => data.map(d => `<td>${fPct(fn(d))}</td>`).join('');
 
   tbody.innerHTML = `
     <tr class="row-section"><td colspan="6">Revenue</td></tr>
-    <tr class="row-indent"><td>Entry Fees — Individual</td>${vals(d=>d.entryFees - (BASE.schoolBase * (0.90*getParams().schoolBasicFee + 0.10*getParams().schoolPremiumFee)/1e5 * Math.pow(1+getParams().schoolGrowth/100, data.indexOf(d))) - (BASE.corpBase * (0.90*getParams().corpBasicFee + 0.10*getParams().corpPremiumFee)/1e5 * Math.pow(1+getParams().corpGrowth/100, data.indexOf(d))))}</tr>
-    <tr class="row-indent"><td>Entry Fees — School Groups</td>${data.map((d,i) => `<td>${fL(BASE.schoolBase * Math.pow(1+getParams().schoolGrowth/100,i) * (0.90*getParams().schoolBasicFee + 0.10*getParams().schoolPremiumFee)/1e5)}</td>`).join('')}</tr>
-    <tr class="row-indent"><td>Entry Fees — Corporate Groups</td>${data.map((d,i) => `<td>${fL(BASE.corpBase * Math.pow(1+getParams().corpGrowth/100,i) * (0.90*getParams().corpBasicFee + 0.10*getParams().corpPremiumFee)/1e5)}</td>`).join('')}</tr>
+    <tr class="row-indent"><td>Entry Fees — Individual</td>${data.map((d,i) => `<td>${fL(BASE.indivBase * Math.pow(1+p.indivGrowth/100,i) * (p.indivBasicPct * p.indivBasicFee + (1-p.indivBasicPct) * p.indivPremiumFee) / 1e5)}</td>`).join('')}</tr>
+    <tr class="row-indent"><td>Entry Fees — School Groups</td>${data.map((d,i) => `<td>${fL(BASE.schoolBase * Math.pow(1+p.schoolGrowth/100,i) * (0.90*p.schoolBasicFee + 0.10*p.schoolPremiumFee)/1e5)}</td>`).join('')}</tr>
+    <tr class="row-indent"><td>Entry Fees — Corporate Groups</td>${data.map((d,i) => `<td>${fL(BASE.corpBase * Math.pow(1+p.corpGrowth/100,i) * (0.90*p.corpBasicFee + 0.10*p.corpPremiumFee)/1e5)}</td>`).join('')}</tr>
     <tr class="row-subtotal"><td>  Total Entry Fees</td>${vals(d=>d.entryFees)}</tr>
-    <tr class="row-indent"><td>Shelter Guided Tour</td>${data.map((d,i) => `<td>${fL(BASE.indivBase * Math.pow(1+getParams().indivGrowth/100,i) * getParams().tourUptake * 100 / 1e5)}</td>`).join('')}</tr>
-    <tr class="row-indent"><td>Petting Area</td>${data.map((d,i) => `<td>${fL(BASE.indivBase * Math.pow(1+getParams().indivGrowth/100,i) * getParams().pettingUptake * 50 / 1e5)}</td>`).join('')}</tr>
-    <tr class="row-indent"><td>Aviary Center</td>${data.map((d,i) => `<td>${fL(BASE.indivBase * Math.pow(1+getParams().indivGrowth/100,i) * getParams().aviaryUptake * 50 / 1e5)}</td>`).join('')}</tr>
-    <tr class="row-indent"><td>Lake Boat Ride</td>${data.map((d,i) => `<td>${fL(BASE.indivBase * Math.pow(1+getParams().indivGrowth/100,i) * getParams().boatUptake * 20 / 1e5)}</td>`).join('')}</tr>
+    <tr class="row-indent"><td>Shelter Guided Tour</td>${data.map((d,i) => `<td>${fL(BASE.indivBase * Math.pow(1+p.indivGrowth/100,i) * p.tourUptake * p.tourPrice / 1e5)}</td>`).join('')}</tr>
+    <tr class="row-indent"><td>Petting Area</td>${data.map((d,i) => `<td>${fL(BASE.indivBase * Math.pow(1+p.indivGrowth/100,i) * p.pettingUptake * p.pettingPrice / 1e5)}</td>`).join('')}</tr>
+    <tr class="row-indent"><td>Aviary Center</td>${data.map((d,i) => `<td>${fL(BASE.indivBase * Math.pow(1+p.indivGrowth/100,i) * p.aviaryUptake * p.aviaryPrice / 1e5)}</td>`).join('')}</tr>
+    <tr class="row-indent"><td>Lake Boat Ride</td>${data.map((d,i) => `<td>${fL(BASE.indivBase * Math.pow(1+p.indivGrowth/100,i) * p.boatUptake * p.boatPrice / 1e5)}</td>`).join('')}</tr>
     <tr class="row-subtotal"><td>  Total Add-On Experiences</td>${vals(d=>d.addOns)}</tr>
-    <tr class="row-indent"><td>F&B Revenue</td>${data.map((d,i) => `<td>${fL(d.fbRetail * getParams().fbRate / (getParams().fbRate + getParams().retailRate || 1))}</td>`).join('')}</tr>
-    <tr class="row-indent"><td>Retail Revenue</td>${data.map((d,i) => `<td>${fL(d.fbRetail * getParams().retailRate / (getParams().fbRate + getParams().retailRate || 1))}</td>`).join('')}</tr>
+    <tr class="row-indent"><td>F&B Revenue</td>${data.map(d => `<td>${fL(d.fbRetail * p.fbRate / (p.fbRate + p.retailRate || 1))}</td>`).join('')}</tr>
+    <tr class="row-indent"><td>Retail Revenue</td>${data.map(d => `<td>${fL(d.fbRetail * p.retailRate / (p.fbRate + p.retailRate || 1))}</td>`).join('')}</tr>
     <tr class="row-indent"><td>Donations &amp; CSR</td>${vals(d=>d.donation)}</tr>
     <tr class="row-subtotal"><td>  Total Other Income</td>${vals(d=>d.otherIncome)}</tr>
     <tr class="row-indent"><td>Veterinary Programs</td>${vals(d=>d.vetRevenue)}</tr>
@@ -1318,7 +1363,8 @@ const DEFAULTS = {
   indivBasicFee: 128, indivPremiumFee: 496,
   schoolBasicFee: 96, schoolPremiumFee: 1572,
   corpBasicFee: 1512, corpPremiumFee: 3584,
-  tourUptake: 23, pettingUptake: 18.4, aviaryUptake: 13.8, boatUptake: 27.6,
+  tourUptake: 23, tourPrice: 100, pettingUptake: 18.4, pettingPrice: 50,
+  aviaryUptake: 13.8, aviaryPrice: 50, boatUptake: 27.6, boatPrice: 20,
   fbRate: 80, retailRate: 20, donationRate: 50,
   fbRetailGrowth: 2, donationGrowth: 3, vetGrowth: 2, adoptionGrowth: 3,
   vet1Rate: 14500, vet1Cohorts: 20, vet1Part: 15, vet1Days: 7,
