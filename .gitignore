@@ -1,0 +1,24 @@
+# macOS
+.DS_Store
+.localized
+
+# Personal files
+Passport.jpg
+Passport.pdf
+PN Headshot.jpeg
+Photos/
+
+# Office temp files
+~$*.docx
+~$*.xlsx
+~$*.pptx
+
+# Screenshots
+Screenshot*.png
+
+# Claude internal
+.claude/
+
+# Other projects on Desktop
+networking-tracker/
+Comps.xlsx
